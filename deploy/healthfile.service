@@ -1,0 +1,29 @@
+# HealthFile as a systemd user unit (omen01). Install:
+#   mkdir -p ~/.config/systemd/user && cp deploy/healthfile.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now healthfile
+#   loginctl enable-linger $USER      # keeps user services running after logout
+# Logs: journalctl --user -u healthfile -f
+[Unit]
+Description=HealthFile: the family's health records, read and filed at home
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/healthfile
+Environment=PORT=8097
+Environment=HOST=127.0.0.1
+Environment=QVAC_URL=http://127.0.0.1:11434/v1
+Environment=QVAC_KEY_FILE=%h/qvac-lab/api-key.txt
+Environment=READER_MODEL=qwen35-4b
+Environment=WRITER_MODEL=qwen35-4b
+Environment=EMBED_MODEL=embgemma
+Environment=EXPLAIN_MODEL=medpsy
+Environment=LANG_DEFAULT=it
+ExecStart=/usr/bin/env node src/server.js
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

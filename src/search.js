@@ -11,9 +11,11 @@ export const CHUNK_OVERLAP = 200;
 /** Split a document's text into chunks by page, then by length with overlap. */
 export function chunkText(text) {
   const out = [];
-  const pages = text.split(/\n\[page (\d+)\]\n/);
+  const pages = text.split(/(?:^|\n)\[page (\d+)\]\n/);
   // split() leaves [before, n1, text1, n2, text2, ...]; a one-page document has no markers
-  const parts = pages.length > 1 ? pages.slice(1).reduce((acc, v, i, a) => (i % 2 === 0 ? acc : [...acc, { page: Number(a[i - 1]), text: v }]), []) : [{ page: 1, text }];
+  const parts = [];
+  if (pages.length > 1) for (let i = 1; i < pages.length; i += 2) parts.push({ page: Number(pages[i]), text: pages[i + 1] ?? '' });
+  else parts.push({ page: 1, text });
   for (const { page, text: t } of parts) {
     const clean = t.trim();
     if (!clean) continue;

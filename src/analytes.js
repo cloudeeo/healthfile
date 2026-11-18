@@ -118,7 +118,7 @@ export function parseNumber(value) {
 /** "3.5 - 5.1", "3,5–5,1", "< 200", "> 40", "≤ 5" → [low, high] (null when open). */
 export function parseReference(ref) {
   if (ref == null) return { low: null, high: null };
-  const s = String(ref).replace(/\s+/g, '').replace(',', '.');
+  const s = String(ref).replace(/\s+/g, '').replace(/,/g, '.');
   let m = /^([-+]?\d+(?:\.\d+)?)[-–—]([-+]?\d+(?:\.\d+)?)$/.exec(s);
   if (m) return { low: Number(m[1]), high: Number(m[2]) };
   m = /^[<≤]([-+]?\d+(?:\.\d+)?)$/.exec(s);

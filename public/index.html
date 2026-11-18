@@ -1,1 +1,47 @@
-<!doctype html><title>HealthFile</title>
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f7f9fa" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#12181e" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="HealthFile">
+  <title>HealthFile</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#/" aria-label="HealthFile">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 3h8l5 5v13H6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v5h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 14h6M12 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span data-i18n="app.name">HealthFile</span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#/" data-route="home" data-i18n="nav.home">Archivio</a>
+      <a href="#/review" data-route="review"><span data-i18n="nav.review">Da controllare</span><span class="badge" id="review-badge" hidden>0</span></a>
+      <a href="#/add" data-route="add" class="primary" data-i18n="nav.add">Aggiungi</a>
+    </nav>
+    <div class="tools">
+      <label class="lang"><span class="sr-only" data-i18n="nav.language">Lingua</span>
+        <select id="lang" aria-label="Lingua"><option value="it">IT</option><option value="fr">FR</option><option value="en">EN</option></select>
+      </label>
+      <button type="button" id="theme" class="chip" aria-pressed="false"></button>
+    </div>
+  </header>
+
+  <p class="notice" id="notice" hidden></p>
+
+  <main id="view" class="view" aria-live="polite"></main>
+
+  <footer class="foot">
+    <span id="privacy" class="privacy"></span>
+    <span class="scope" data-i18n="footer.scope"></span>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

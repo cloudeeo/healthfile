@@ -240,7 +240,7 @@ export class Store {
       args.push(analyte);
     }
     return this.db
-      .prepare(`SELECT id, document_id AS documentId, person_id AS personId, date, page, name, analyte, value, number, unit, reference, ref_low AS refLow, ref_high AS refHigh, flag, edited FROM measurements${where.length ? ` WHERE ${where.join(' AND ')}` : ''} ORDER BY date, name`)
+      .prepare(`SELECT id, document_id AS documentId, person_id AS personId, date, page, name, analyte, value, number, unit, reference, ref_low AS refLow, ref_high AS refHigh, flag, edited FROM measurements${where.length ? ` WHERE ${where.join(' AND ')}` : ''} ORDER BY date, rowid`)
       .all(...args)
       .map((m) => ({ ...m, edited: !!m.edited }));
   }
