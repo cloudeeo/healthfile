@@ -60,7 +60,7 @@ Configuration is by environment (see [deploy/healthfile.service](deploy/healthfi
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `PORT`, `HOST` | `8097`, `127.0.0.1` | Publish on the tailnet with `tailscale serve`, as the dashboard. |
+| `PORT`, `HOST` | `8097`, `127.0.0.1` | On omen01 the unit uses 8096; `deploy/install-omen01.sh` installs the tools, the unit and publishes it on the tailnet (HTTPS, port 8443). |
 | `DATA_DIR` | `~/.local/share/healthfile` | Originals, page images and the SQLite database, mode 0700. |
 | `QVAC_URL` | `http://127.0.0.1:11434/v1` | `qvac serve`'s OpenAI-compatible API. |
 | `QVAC_KEY_FILE` | `~/qvac-lab/api-key.txt` | Read per request, never logged. Empty string: no key. |

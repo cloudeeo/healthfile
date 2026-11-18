@@ -10,7 +10,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=%h/healthfile
-Environment=PORT=8097
+Environment=PORT=8096
 Environment=HOST=127.0.0.1
 Environment=QVAC_URL=http://127.0.0.1:11434/v1
 Environment=QVAC_KEY_FILE=%h/qvac-lab/api-key.txt
