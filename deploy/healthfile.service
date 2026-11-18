@@ -19,6 +19,7 @@ Environment=WRITER_MODEL=qwen35-4b
 Environment=EMBED_MODEL=embgemma
 Environment=EXPLAIN_MODEL=medpsy
 Environment=LANG_DEFAULT=it
+# install-omen01.sh replaces this with the absolute path of node (nvm is not on systemd's PATH)
 ExecStart=/usr/bin/env node src/server.js
 Restart=on-failure
 RestartSec=3

@@ -13,12 +13,17 @@ else
 fi
 mkdir -p "$HOME/.config/systemd/user" "$HOME/.local/share/healthfile"
 chmod 700 "$HOME/.local/share/healthfile"
-cp "$HOME/healthfile/deploy/healthfile.service" "$HOME/.config/systemd/user/healthfile.service"
+# systemd user units do not load nvm's PATH: write the absolute path of node into the unit
+NODE_BIN="$(command -v node)"
+[ -n "$NODE_BIN" ] || { echo "node not found in PATH"; exit 1; }
+sed "s|^ExecStart=.*|ExecStart=$NODE_BIN src/server.js|" "$HOME/healthfile/deploy/healthfile.service" > "$HOME/.config/systemd/user/healthfile.service"
 systemctl --user daemon-reload
-systemctl --user enable --now healthfile
-sleep 2
+systemctl --user enable healthfile
+systemctl --user restart healthfile
+sleep 3
 systemctl --user --no-pager status healthfile | head -5
-curl -s http://127.0.0.1:8096/api/status | head -c 300; echo
+curl -s http://127.0.0.1:8096/api/status | head -c 300 || echo "not answering yet: journalctl --user -u healthfile -n 20"
+echo
 # publish on the tailnet, HTTPS on port 8443, next to the dashboard
 tailscale serve --bg --https=8443 http://127.0.0.1:8096
 echo "Open https://<this machine's tailnet name>:8443/ from any device on the tailnet."
