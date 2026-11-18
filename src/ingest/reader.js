@@ -1,0 +1,134 @@
+// Reading one page with the vision model: the prompt, the JSON shape, the
+// repair pass, and the merge of pages into one document.
+
+import { complete, extractJson } from '../llm/client.js';
+import { KINDS } from '../store.js';
+import { toMeasurement } from '../analytes.js';
+
+export const READER_SYSTEM =
+  'You read medical and administrative documents for a family archive. ' +
+  'You transcribe faithfully, you never invent, and you never give medical advice.';
+
+export const READER_PROMPT = `Read this page of a document and answer with ONE JSON object and nothing else:
+{
+  "language": "it" | "fr" | "en" | "de" | "other",
+  "kind": "lab_report" | "letter" | "prescription" | "vaccination" | "imaging_report" | "discharge" | "invoice" | "insurance" | "other",
+  "date": "YYYY-MM-DD" or null (the date of the document, the sample or the visit; not a birth date, not a print date if another date is clearly the document's),
+  "person_hint": the patient's or insured person's full name as printed, or null,
+  "issuer": the laboratory, practice, hospital, pharmacy or insurer that produced it, or null,
+  "title": a short title in the document's language (e.g. "Esami del sangue", "Lettera del pediatra", "Fattura"), max 60 characters,
+  "text": the full text of the page, transcribed faithfully, in reading order, with line breaks; tables as one row per line with " | " between cells,
+  "values": for a lab report, one entry per analyte: { "name": as printed, "value": as printed (e.g. "5,4" or "< 0.5"), "unit": as printed or null, "reference": the reference range as printed or null, "flag": "H" | "L" | null as printed }; otherwise [],
+  "medications": for a prescription or a letter that prescribes: [{ "name", "dose", "schedule" }], else [],
+  "follow_ups": appointments or checks the document asks for: [{ "what", "when" }], else [],
+  "amount": for an invoice or a reimbursement statement: { "total": number, "currency": "CHF" | "EUR" | ... } or null
+}
+Rules: copy numbers, units and ranges exactly as printed, including the decimal mark; do not translate; do not summarise; if a part is unreadable write "[illegible]"; JSON only.`;
+
+export const REPAIR_PROMPT = 'The following text was meant to be one JSON object with the keys language, kind, date, person_hint, issuer, title, text, values, medications, follow_ups, amount. Return the same content as valid JSON and nothing else. Do not change any value.\n\n';
+
+const LANGS = new Set(['it', 'fr', 'en', 'de', 'other']);
+
+/** Make what the model returned safe to store: known keys, right types, nothing else. */
+export function normalisePage(raw) {
+  const o = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const str = (v, max = 400) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
+  const date = typeof o.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.date.trim()) ? o.date.trim() : null;
+  const kind = KINDS.includes(o.kind) ? o.kind : 'other';
+  const language = LANGS.has(o.language) ? o.language : 'other';
+  const arr = (v) => (Array.isArray(v) ? v : []);
+  const values = arr(o.values)
+    .filter((v) => v && typeof v === 'object' && typeof v.name === 'string' && v.name.trim())
+    .slice(0, 200)
+    .map((v) => ({ name: v.name.trim().slice(0, 120), value: v.value == null ? null : String(v.value).trim().slice(0, 40), unit: str(v.unit, 30), reference: str(v.reference, 60), flag: str(v.flag, 8) }));
+  const medications = arr(o.medications)
+    .filter((m) => m && typeof m === 'object' && typeof m.name === 'string' && m.name.trim())
+    .slice(0, 50)
+    .map((m) => ({ name: m.name.trim().slice(0, 120), dose: str(m.dose, 80), schedule: str(m.schedule, 120) }));
+  const followUps = arr(o.follow_ups)
+    .filter((f) => f && typeof f === 'object' && typeof f.what === 'string' && f.what.trim())
+    .slice(0, 50)
+    .map((f) => ({ what: f.what.trim().slice(0, 200), when: str(f.when, 80) }));
+  const amount = o.amount && typeof o.amount === 'object' && Number.isFinite(Number(o.amount.total)) ? { total: Number(o.amount.total), currency: str(o.amount.currency, 8) } : null;
+  return {
+    language,
+    kind,
+    date,
+    personHint: str(o.person_hint, 120),
+    issuer: str(o.issuer, 160),
+    title: str(o.title, 80),
+    text: typeof o.text === 'string' ? o.text.trim().slice(0, 40_000) : '',
+    values,
+    medications,
+    followUps,
+    amount,
+  };
+}
+
+/**
+ * Read one page image.
+ * @param {object} o
+ * @param {string} o.dataUrl  the page as a data URL (JPEG/PNG)
+ * @returns {Promise<{ ok: true, page: object, raw: object, ms: number, repaired: boolean } | { ok: false, error: string, ms: number }>}
+ */
+export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
+  const t0 = deps.now();
+  const r = await complete({
+    qvac,
+    deps,
+    model: qvac.reader,
+    messages: [
+      { role: 'system', content: READER_SYSTEM },
+      { role: 'user', content: [{ type: 'text', text: READER_PROMPT }, { type: 'image', dataUrl }] },
+    ],
+    maxTokens: 6000,
+    temperature: 0,
+    timeoutMs,
+    signal,
+  });
+  if (!r.ok) return { ok: false, error: r.error, ms: deps.now() - t0 };
+  let raw = extractJson(r.content);
+  let repaired = false;
+  if (!raw) {
+    // a second pass with the text model, which only has to fix the JSON
+    const fix = await complete({ qvac, deps, model: qvac.writer, messages: [{ role: 'user', content: REPAIR_PROMPT + r.content.slice(0, 30_000) }], maxTokens: 6000, temperature: 0, timeoutMs, signal });
+    if (fix.ok) raw = extractJson(fix.content);
+    repaired = !!raw;
+    if (!raw) return { ok: false, error: r.finish === 'length' ? 'the page is too long for the reader' : 'the reader did not return JSON', ms: deps.now() - t0 };
+  }
+  return { ok: true, page: normalisePage(raw), raw, ms: deps.now() - t0, repaired, finish: r.finish ?? null };
+}
+
+/** Join the pages of one document: first page's header fields, all texts, all values. */
+export function mergePages(pages) {
+  const first = pages.find((p) => p.kind !== 'other') ?? pages[0] ?? normalisePage({});
+  const dates = pages.map((p) => p.date).filter(Boolean);
+  const kinds = pages.map((p) => p.kind).filter((k) => k !== 'other');
+  const kind = kinds.length ? mostCommon(kinds) : 'other';
+  const measurements = [];
+  pages.forEach((p, i) => {
+    for (const v of p.values) {
+      const m = toMeasurement(v, i + 1);
+      if (m) measurements.push(m);
+    }
+  });
+  return {
+    language: first.language,
+    kind,
+    date: dates[0] ?? null,
+    personHint: pages.map((p) => p.personHint).find(Boolean) ?? null,
+    issuer: pages.map((p) => p.issuer).find(Boolean) ?? null,
+    title: first.title ?? pages.map((p) => p.title).find(Boolean) ?? null,
+    text: pages.map((p, i) => (pages.length > 1 ? `[page ${i + 1}]\n${p.text}` : p.text)).join('\n\n'),
+    measurements,
+    medications: pages.flatMap((p) => p.medications),
+    followUps: pages.flatMap((p) => p.followUps),
+    amount: pages.map((p) => p.amount).find(Boolean) ?? null,
+  };
+}
+
+function mostCommon(list) {
+  const n = new Map();
+  for (const x of list) n.set(x, (n.get(x) ?? 0) + 1);
+  return [...n.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}

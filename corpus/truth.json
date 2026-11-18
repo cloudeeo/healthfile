@@ -1,0 +1,2089 @@
+{
+ "family": {
+  "surname": "Bellandi",
+  "people": [
+   {
+    "id": "marco",
+    "name": "Marco Bellandi",
+    "born": "1979-03-14",
+    "sex": "M"
+   },
+   {
+    "id": "giulia",
+    "name": "Giulia Ferrante",
+    "born": "1982-11-02",
+    "sex": "F"
+   },
+   {
+    "id": "tommaso",
+    "name": "Tommaso Bellandi",
+    "born": "2014-06-21",
+    "sex": "M"
+   },
+   {
+    "id": "nonna",
+    "name": "Adele Ferrante",
+    "born": "1951-08-30",
+    "sex": "F"
+   }
+  ]
+ },
+ "documents": [
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2024-09-03",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "15,7",
+     "unit": "g/dL",
+     "reference": "13.5 - 17.5",
+     "flag": null,
+     "number": 15.7,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "44,4",
+     "unit": "%",
+     "reference": "40 - 52",
+     "flag": null,
+     "number": 44.4,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "5,4",
+     "unit": "10^6/µL",
+     "reference": "4.5 - 5.9",
+     "flag": null,
+     "number": 5.4,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "6,3",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 6.3,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "251",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 251.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "92",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 92.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Colesterolo totale",
+     "value": "220",
+     "unit": "mg/dL",
+     "reference": "< 200",
+     "flag": "H",
+     "number": 220.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo HDL",
+     "value": "47",
+     "unit": "mg/dL",
+     "reference": "> 40",
+     "flag": null,
+     "number": 47.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo LDL",
+     "value": "147",
+     "unit": "mg/dL",
+     "reference": "< 130",
+     "flag": "H",
+     "number": 147.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Trigliceridi",
+     "value": "163",
+     "unit": "mg/dL",
+     "reference": "< 150",
+     "flag": "H",
+     "number": 163.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Glicemia",
+     "value": "96",
+     "unit": "mg/dL",
+     "reference": "70 - 99",
+     "flag": null,
+     "number": 96.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Emoglobina glicata (HbA1c)",
+     "value": "5,8",
+     "unit": "%",
+     "reference": "4.0 - 5.6",
+     "flag": "H",
+     "number": 5.8,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Creatinina",
+     "value": "1,0",
+     "unit": "mg/dL",
+     "reference": "0.7 - 1.2",
+     "flag": null,
+     "number": 1.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Acido urico",
+     "value": "6,2",
+     "unit": "mg/dL",
+     "reference": "3.5 - 7.2",
+     "flag": null,
+     "number": 6.2,
+     "panel": "metabolico"
+    },
+    {
+     "name": "ALT (GPT)",
+     "value": "36",
+     "unit": "U/L",
+     "reference": "< 41",
+     "flag": null,
+     "number": 36.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "AST (GOT)",
+     "value": "27",
+     "unit": "U/L",
+     "reference": "< 40",
+     "flag": null,
+     "number": 27.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Gamma GT",
+     "value": "38",
+     "unit": "U/L",
+     "reference": "< 60",
+     "flag": null,
+     "number": 38.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Ferritina",
+     "value": "94",
+     "unit": "ng/mL",
+     "reference": "30 - 400",
+     "flag": null,
+     "number": 94.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Sideremia",
+     "value": "97",
+     "unit": "µg/dL",
+     "reference": "60 - 160",
+     "flag": null,
+     "number": 97.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Vitamina D (25-OH)",
+     "value": "24",
+     "unit": "ng/mL",
+     "reference": "30 - 100",
+     "flag": "L",
+     "number": 24.0,
+     "panel": "ferro"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/marco-lab-2024-09-03.pdf",
+   "id": "marco-lab-2024-09-03",
+   "photo": "photo/marco-lab-2024-09-03.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2025-03-03",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "15,0",
+     "unit": "g/dL",
+     "reference": "13.5 - 17.5",
+     "flag": null,
+     "number": 15.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "46,0",
+     "unit": "%",
+     "reference": "40 - 52",
+     "flag": null,
+     "number": 46.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "5,1",
+     "unit": "10^6/µL",
+     "reference": "4.5 - 5.9",
+     "flag": null,
+     "number": 5.1,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "6,3",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 6.3,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "242",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 242.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "87",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 87.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Colesterolo totale",
+     "value": "207",
+     "unit": "mg/dL",
+     "reference": "< 200",
+     "flag": "H",
+     "number": 207.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo HDL",
+     "value": "46",
+     "unit": "mg/dL",
+     "reference": "> 40",
+     "flag": null,
+     "number": 46.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo LDL",
+     "value": "140",
+     "unit": "mg/dL",
+     "reference": "< 130",
+     "flag": "H",
+     "number": 140.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Trigliceridi",
+     "value": "170",
+     "unit": "mg/dL",
+     "reference": "< 150",
+     "flag": "H",
+     "number": 170.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Glicemia",
+     "value": "98",
+     "unit": "mg/dL",
+     "reference": "70 - 99",
+     "flag": null,
+     "number": 98.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Emoglobina glicata (HbA1c)",
+     "value": "5,6",
+     "unit": "%",
+     "reference": "4.0 - 5.6",
+     "flag": "H",
+     "number": 5.6,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Creatinina",
+     "value": "1,0",
+     "unit": "mg/dL",
+     "reference": "0.7 - 1.2",
+     "flag": null,
+     "number": 1.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Acido urico",
+     "value": "6,5",
+     "unit": "mg/dL",
+     "reference": "3.5 - 7.2",
+     "flag": null,
+     "number": 6.5,
+     "panel": "metabolico"
+    },
+    {
+     "name": "ALT (GPT)",
+     "value": "33",
+     "unit": "U/L",
+     "reference": "< 41",
+     "flag": null,
+     "number": 33.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "AST (GOT)",
+     "value": "28",
+     "unit": "U/L",
+     "reference": "< 40",
+     "flag": null,
+     "number": 28.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Gamma GT",
+     "value": "37",
+     "unit": "U/L",
+     "reference": "< 60",
+     "flag": null,
+     "number": 37.0,
+     "panel": "metabolico"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/marco-lab-2025-03-03.pdf",
+   "id": "marco-lab-2025-03-03",
+   "photo": "photo/marco-lab-2025-03-03.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2025-09-05",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "14,8",
+     "unit": "g/dL",
+     "reference": "13.5 - 17.5",
+     "flag": null,
+     "number": 14.8,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "45,1",
+     "unit": "%",
+     "reference": "40 - 52",
+     "flag": null,
+     "number": 45.1,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "4,9",
+     "unit": "10^6/µL",
+     "reference": "4.5 - 5.9",
+     "flag": null,
+     "number": 4.9,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "6,1",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 6.1,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "251",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 251.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "87",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 87.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Colesterolo totale",
+     "value": "229",
+     "unit": "mg/dL",
+     "reference": "< 200",
+     "flag": "H",
+     "number": 229.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo HDL",
+     "value": "46",
+     "unit": "mg/dL",
+     "reference": "> 40",
+     "flag": null,
+     "number": 46.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo LDL",
+     "value": "146",
+     "unit": "mg/dL",
+     "reference": "< 130",
+     "flag": "H",
+     "number": 146.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Trigliceridi",
+     "value": "164",
+     "unit": "mg/dL",
+     "reference": "< 150",
+     "flag": "H",
+     "number": 164.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Glicemia",
+     "value": "98",
+     "unit": "mg/dL",
+     "reference": "70 - 99",
+     "flag": null,
+     "number": 98.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Emoglobina glicata (HbA1c)",
+     "value": "5,4",
+     "unit": "%",
+     "reference": "4.0 - 5.6",
+     "flag": null,
+     "number": 5.4,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Creatinina",
+     "value": "1,0",
+     "unit": "mg/dL",
+     "reference": "0.7 - 1.2",
+     "flag": null,
+     "number": 1.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Acido urico",
+     "value": "5,6",
+     "unit": "mg/dL",
+     "reference": "3.5 - 7.2",
+     "flag": null,
+     "number": 5.6,
+     "panel": "metabolico"
+    },
+    {
+     "name": "ALT (GPT)",
+     "value": "37",
+     "unit": "U/L",
+     "reference": "< 41",
+     "flag": null,
+     "number": 37.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "AST (GOT)",
+     "value": "29",
+     "unit": "U/L",
+     "reference": "< 40",
+     "flag": null,
+     "number": 29.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Gamma GT",
+     "value": "40",
+     "unit": "U/L",
+     "reference": "< 60",
+     "flag": null,
+     "number": 40.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Ferritina",
+     "value": "97",
+     "unit": "ng/mL",
+     "reference": "30 - 400",
+     "flag": null,
+     "number": 97.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Sideremia",
+     "value": "91",
+     "unit": "µg/dL",
+     "reference": "60 - 160",
+     "flag": null,
+     "number": 91.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Vitamina D (25-OH)",
+     "value": "24",
+     "unit": "ng/mL",
+     "reference": "30 - 100",
+     "flag": "L",
+     "number": 24.0,
+     "panel": "ferro"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/marco-lab-2025-09-05.pdf",
+   "id": "marco-lab-2025-09-05",
+   "photo": "photo/marco-lab-2025-09-05.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2026-03-02",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "15,6",
+     "unit": "g/dL",
+     "reference": "13.5 - 17.5",
+     "flag": null,
+     "number": 15.6,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "47,3",
+     "unit": "%",
+     "reference": "40 - 52",
+     "flag": null,
+     "number": 47.3,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "4,6",
+     "unit": "10^6/µL",
+     "reference": "4.5 - 5.9",
+     "flag": null,
+     "number": 4.6,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "5,8",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 5.8,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "242",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 242.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "94",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 94.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Colesterolo totale",
+     "value": "229",
+     "unit": "mg/dL",
+     "reference": "< 200",
+     "flag": "H",
+     "number": 229.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo HDL",
+     "value": "43",
+     "unit": "mg/dL",
+     "reference": "> 40",
+     "flag": null,
+     "number": 43.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo LDL",
+     "value": "135",
+     "unit": "mg/dL",
+     "reference": "< 130",
+     "flag": "H",
+     "number": 135.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Trigliceridi",
+     "value": "174",
+     "unit": "mg/dL",
+     "reference": "< 150",
+     "flag": "H",
+     "number": 174.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Glicemia",
+     "value": "97",
+     "unit": "mg/dL",
+     "reference": "70 - 99",
+     "flag": null,
+     "number": 97.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Emoglobina glicata (HbA1c)",
+     "value": "5,5",
+     "unit": "%",
+     "reference": "4.0 - 5.6",
+     "flag": null,
+     "number": 5.5,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Creatinina",
+     "value": "1,0",
+     "unit": "mg/dL",
+     "reference": "0.7 - 1.2",
+     "flag": null,
+     "number": 1.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Acido urico",
+     "value": "6,5",
+     "unit": "mg/dL",
+     "reference": "3.5 - 7.2",
+     "flag": null,
+     "number": 6.5,
+     "panel": "metabolico"
+    },
+    {
+     "name": "ALT (GPT)",
+     "value": "36",
+     "unit": "U/L",
+     "reference": "< 41",
+     "flag": null,
+     "number": 36.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "AST (GOT)",
+     "value": "28",
+     "unit": "U/L",
+     "reference": "< 40",
+     "flag": null,
+     "number": 28.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Gamma GT",
+     "value": "41",
+     "unit": "U/L",
+     "reference": "< 60",
+     "flag": null,
+     "number": 41.0,
+     "panel": "metabolico"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/marco-lab-2026-03-02.pdf",
+   "id": "marco-lab-2026-03-02",
+   "photo": "photo/marco-lab-2026-03-02.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2026-09-01",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "15,1",
+     "unit": "g/dL",
+     "reference": "13.5 - 17.5",
+     "flag": null,
+     "number": 15.1,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "43,2",
+     "unit": "%",
+     "reference": "40 - 52",
+     "flag": null,
+     "number": 43.2,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "5,2",
+     "unit": "10^6/µL",
+     "reference": "4.5 - 5.9",
+     "flag": null,
+     "number": 5.2,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "6,0",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 6.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "245",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 245.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "92",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 92.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Colesterolo totale",
+     "value": "226",
+     "unit": "mg/dL",
+     "reference": "< 200",
+     "flag": "H",
+     "number": 226.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo HDL",
+     "value": "47",
+     "unit": "mg/dL",
+     "reference": "> 40",
+     "flag": null,
+     "number": 47.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo LDL",
+     "value": "145",
+     "unit": "mg/dL",
+     "reference": "< 130",
+     "flag": "H",
+     "number": 145.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Trigliceridi",
+     "value": "179",
+     "unit": "mg/dL",
+     "reference": "< 150",
+     "flag": "H",
+     "number": 179.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Glicemia",
+     "value": "98",
+     "unit": "mg/dL",
+     "reference": "70 - 99",
+     "flag": null,
+     "number": 98.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Emoglobina glicata (HbA1c)",
+     "value": "5,2",
+     "unit": "%",
+     "reference": "4.0 - 5.6",
+     "flag": null,
+     "number": 5.2,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Creatinina",
+     "value": "0,9",
+     "unit": "mg/dL",
+     "reference": "0.7 - 1.2",
+     "flag": null,
+     "number": 0.9,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Acido urico",
+     "value": "6,1",
+     "unit": "mg/dL",
+     "reference": "3.5 - 7.2",
+     "flag": null,
+     "number": 6.1,
+     "panel": "metabolico"
+    },
+    {
+     "name": "ALT (GPT)",
+     "value": "36",
+     "unit": "U/L",
+     "reference": "< 41",
+     "flag": null,
+     "number": 36.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "AST (GOT)",
+     "value": "28",
+     "unit": "U/L",
+     "reference": "< 40",
+     "flag": null,
+     "number": 28.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Gamma GT",
+     "value": "42",
+     "unit": "U/L",
+     "reference": "< 60",
+     "flag": null,
+     "number": 42.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Ferritina",
+     "value": "100",
+     "unit": "ng/mL",
+     "reference": "30 - 400",
+     "flag": null,
+     "number": 100.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Sideremia",
+     "value": "105",
+     "unit": "µg/dL",
+     "reference": "60 - 160",
+     "flag": null,
+     "number": 105.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Vitamina D (25-OH)",
+     "value": "24",
+     "unit": "ng/mL",
+     "reference": "30 - 100",
+     "flag": "L",
+     "number": 24.0,
+     "panel": "ferro"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/marco-lab-2026-09-01.pdf",
+   "id": "marco-lab-2026-09-01",
+   "photo": "photo/marco-lab-2026-09-01.jpg"
+  },
+  {
+   "kind": "letter",
+   "language": "it",
+   "date": "2025-10-06",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Centro Cardiologico Dimostrativo",
+   "title": "Referto visita cardiologica",
+   "values": [
+    {
+     "name": "Pressione sistolica",
+     "value": "130",
+     "unit": "mmHg",
+     "reference": null,
+     "flag": null,
+     "number": 130,
+     "panel": "visita"
+    },
+    {
+     "name": "Pressione diastolica",
+     "value": "83",
+     "unit": "mmHg",
+     "reference": null,
+     "flag": null,
+     "number": 83,
+     "panel": "visita"
+    },
+    {
+     "name": "Frequenza cardiaca",
+     "value": "69",
+     "unit": "bpm",
+     "reference": null,
+     "flag": null,
+     "number": 69,
+     "panel": "visita"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [
+    {
+     "what": "controllo cardiologico con profilo lipidico",
+     "when": "fra 6 mesi"
+    }
+   ],
+   "amount": null,
+   "file": "pdf/marco-cardio-2025-10.pdf",
+   "id": "marco-cardio-2025-10",
+   "photo": "photo/marco-cardio-2025-10.jpg"
+  },
+  {
+   "kind": "prescription",
+   "language": "it",
+   "date": "2025-10-11",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Dr.ssa Elena Prova, medicina generale",
+   "title": "Ricetta medica",
+   "values": [],
+   "medications": [
+    {
+     "name": "Atorvastatina",
+     "dose": "20 mg",
+     "schedule": "1 compressa la sera"
+    },
+    {
+     "name": "Vitamina D3 gocce",
+     "dose": "800 UI",
+     "schedule": "4 gocce al giorno"
+    }
+   ],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/marco-ricetta-2025-10.pdf",
+   "id": "marco-ricetta-2025-10",
+   "photo": "photo/marco-ricetta-2025-10.jpg"
+  },
+  {
+   "kind": "invoice",
+   "language": "it",
+   "date": "2024-09-21",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Fattura",
+   "values": [],
+   "medications": [],
+   "follow_ups": [],
+   "amount": {
+    "total": 86.1,
+    "currency": "CHF"
+   },
+   "file": "pdf/marco-fattura-lab-2024-09.pdf",
+   "id": "marco-fattura-lab-2024-09",
+   "photo": "photo/marco-fattura-lab-2024-09.jpg"
+  },
+  {
+   "kind": "invoice",
+   "language": "it",
+   "date": "2025-10-16",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Farmacia Esemplare",
+   "title": "Fattura",
+   "values": [],
+   "medications": [],
+   "follow_ups": [],
+   "amount": {
+    "total": 53.4,
+    "currency": "CHF"
+   },
+   "file": "pdf/marco-fattura-farmacia-2025-10.pdf",
+   "id": "marco-fattura-farmacia-2025-10",
+   "photo": "photo/marco-fattura-farmacia-2025-10.jpg"
+  },
+  {
+   "kind": "insurance",
+   "language": "it",
+   "date": "2026-01-01",
+   "person": "marco",
+   "person_hint": "Marco Bellandi",
+   "issuer": "Assicura Demo SA",
+   "title": "Polizza assicurazione malattia",
+   "values": [],
+   "medications": [],
+   "follow_ups": [
+    {
+     "what": "termine di disdetta della polizza",
+     "when": "30 novembre"
+    }
+   ],
+   "amount": {
+    "total": 384.5,
+    "currency": "CHF"
+   },
+   "file": "pdf/marco-polizza-2026.pdf",
+   "id": "marco-polizza-2026"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2024-11-03",
+   "person": "giulia",
+   "person_hint": "Giulia Ferrante",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "12,9",
+     "unit": "g/dL",
+     "reference": "12.0 - 16.0",
+     "flag": null,
+     "number": 12.9,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "41,1",
+     "unit": "%",
+     "reference": "36 - 46",
+     "flag": null,
+     "number": 41.1,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "4,4",
+     "unit": "10^6/µL",
+     "reference": "4.0 - 5.2",
+     "flag": null,
+     "number": 4.4,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "6,9",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 6.9,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "276",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 276.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "88",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 88.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "TSH",
+     "value": "3,2",
+     "unit": "mU/L",
+     "reference": "0.4 - 4.0",
+     "flag": null,
+     "number": 3.2,
+     "panel": "tiroide"
+    },
+    {
+     "name": "FT4",
+     "value": "14,7",
+     "unit": "pmol/L",
+     "reference": "12 - 22",
+     "flag": null,
+     "number": 14.7,
+     "panel": "tiroide"
+    },
+    {
+     "name": "Ferritina",
+     "value": "23",
+     "unit": "ng/mL",
+     "reference": "15 - 150",
+     "flag": null,
+     "number": 23.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Sideremia",
+     "value": "60",
+     "unit": "µg/dL",
+     "reference": "50 - 150",
+     "flag": null,
+     "number": 60.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Vitamina D (25-OH)",
+     "value": "24",
+     "unit": "ng/mL",
+     "reference": "30 - 100",
+     "flag": "L",
+     "number": 24.0,
+     "panel": "ferro"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/giulia-lab-2024-11-03.pdf",
+   "id": "giulia-lab-2024-11-03",
+   "photo": "photo/giulia-lab-2024-11-03.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "fr",
+   "date": "2025-11-01",
+   "person": "giulia",
+   "person_hint": "Giulia Ferrante",
+   "issuer": "Laboratoire Exemple SA",
+   "title": "Rapport d'analyses",
+   "values": [
+    {
+     "name": "Hémoglobine",
+     "value": "13,1",
+     "unit": "g/dL",
+     "reference": "12.0 - 16.0",
+     "flag": null,
+     "number": 13.1,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Hématocrite",
+     "value": "39,3",
+     "unit": "%",
+     "reference": "36 - 46",
+     "flag": null,
+     "number": 39.3,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Érythrocytes",
+     "value": "4,4",
+     "unit": "10^6/µL",
+     "reference": "4.0 - 5.2",
+     "flag": null,
+     "number": 4.4,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucocytes",
+     "value": "6,8",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 6.8,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Plaquettes",
+     "value": "275",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 275.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "VGM",
+     "value": "87",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 87.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "TSH",
+     "value": "3,2",
+     "unit": "mU/L",
+     "reference": "0.4 - 4.0",
+     "flag": null,
+     "number": 3.2,
+     "panel": "tiroide"
+    },
+    {
+     "name": "T4 libre",
+     "value": "15,3",
+     "unit": "pmol/L",
+     "reference": "12 - 22",
+     "flag": null,
+     "number": 15.3,
+     "panel": "tiroide"
+    },
+    {
+     "name": "Ferritine",
+     "value": "20",
+     "unit": "ng/mL",
+     "reference": "15 - 150",
+     "flag": null,
+     "number": 20.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Fer sérique",
+     "value": "55",
+     "unit": "µg/dL",
+     "reference": "50 - 150",
+     "flag": null,
+     "number": 55.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Vitamine D (25-OH)",
+     "value": "27",
+     "unit": "ng/mL",
+     "reference": "30 - 100",
+     "flag": "L",
+     "number": 27.0,
+     "panel": "ferro"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/giulia-lab-2025-11-01.pdf",
+   "id": "giulia-lab-2025-11-01",
+   "photo": "photo/giulia-lab-2025-11-01.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2026-11-02",
+   "person": "giulia",
+   "person_hint": "Giulia Ferrante",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "13,4",
+     "unit": "g/dL",
+     "reference": "12.0 - 16.0",
+     "flag": null,
+     "number": 13.4,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "38,2",
+     "unit": "%",
+     "reference": "36 - 46",
+     "flag": null,
+     "number": 38.2,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "4,4",
+     "unit": "10^6/µL",
+     "reference": "4.0 - 5.2",
+     "flag": null,
+     "number": 4.4,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "6,5",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 6.5,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "272",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 272.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "96",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 96.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "TSH",
+     "value": "3,0",
+     "unit": "mU/L",
+     "reference": "0.4 - 4.0",
+     "flag": null,
+     "number": 3.0,
+     "panel": "tiroide"
+    },
+    {
+     "name": "FT4",
+     "value": "14,9",
+     "unit": "pmol/L",
+     "reference": "12 - 22",
+     "flag": null,
+     "number": 14.9,
+     "panel": "tiroide"
+    },
+    {
+     "name": "Ferritina",
+     "value": "23",
+     "unit": "ng/mL",
+     "reference": "15 - 150",
+     "flag": null,
+     "number": 23.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Sideremia",
+     "value": "56",
+     "unit": "µg/dL",
+     "reference": "50 - 150",
+     "flag": null,
+     "number": 56.0,
+     "panel": "ferro"
+    },
+    {
+     "name": "Vitamina D (25-OH)",
+     "value": "27",
+     "unit": "ng/mL",
+     "reference": "30 - 100",
+     "flag": "L",
+     "number": 27.0,
+     "panel": "ferro"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/giulia-lab-2026-11-02.pdf",
+   "id": "giulia-lab-2026-11-02",
+   "photo": "photo/giulia-lab-2026-11-02.jpg"
+  },
+  {
+   "kind": "letter",
+   "language": "it",
+   "date": "2024-10-05",
+   "person": "tommaso",
+   "person_hint": "Tommaso Bellandi",
+   "issuer": "Studio Pediatrico Esempio",
+   "title": "Relazione visita pediatrica",
+   "values": [
+    {
+     "name": "Peso",
+     "value": "44,7",
+     "unit": "kg",
+     "reference": null,
+     "flag": null,
+     "number": 44.7,
+     "panel": "visita"
+    },
+    {
+     "name": "Altezza",
+     "value": "143",
+     "unit": "cm",
+     "reference": null,
+     "flag": null,
+     "number": 143,
+     "panel": "visita"
+    }
+   ],
+   "medications": [
+    {
+     "name": "Vitamina D",
+     "dose": "400 UI",
+     "schedule": "al giorno, mesi invernali"
+    }
+   ],
+   "follow_ups": [
+    {
+     "what": "controllo pediatrico",
+     "when": "fra 12 mesi"
+    }
+   ],
+   "amount": null,
+   "file": "pdf/tommaso-pediatra-2024-10-05.pdf",
+   "id": "tommaso-pediatra-2024-10-05",
+   "photo": "photo/tommaso-pediatra-2024-10-05.jpg"
+  },
+  {
+   "kind": "letter",
+   "language": "it",
+   "date": "2025-10-07",
+   "person": "tommaso",
+   "person_hint": "Tommaso Bellandi",
+   "issuer": "Studio Pediatrico Esempio",
+   "title": "Relazione visita pediatrica",
+   "values": [
+    {
+     "name": "Peso",
+     "value": "48,1",
+     "unit": "kg",
+     "reference": null,
+     "flag": null,
+     "number": 48.1,
+     "panel": "visita"
+    },
+    {
+     "name": "Altezza",
+     "value": "151",
+     "unit": "cm",
+     "reference": null,
+     "flag": null,
+     "number": 151,
+     "panel": "visita"
+    }
+   ],
+   "medications": [
+    {
+     "name": "Vitamina D",
+     "dose": "400 UI",
+     "schedule": "al giorno, mesi invernali"
+    }
+   ],
+   "follow_ups": [
+    {
+     "what": "controllo pediatrico",
+     "when": "fra 12 mesi"
+    }
+   ],
+   "amount": null,
+   "file": "pdf/tommaso-pediatra-2025-10-07.pdf",
+   "id": "tommaso-pediatra-2025-10-07",
+   "photo": "photo/tommaso-pediatra-2025-10-07.jpg"
+  },
+  {
+   "kind": "letter",
+   "language": "it",
+   "date": "2026-10-07",
+   "person": "tommaso",
+   "person_hint": "Tommaso Bellandi",
+   "issuer": "Studio Pediatrico Esempio",
+   "title": "Relazione visita pediatrica",
+   "values": [
+    {
+     "name": "Peso",
+     "value": "51,9",
+     "unit": "kg",
+     "reference": null,
+     "flag": null,
+     "number": 51.9,
+     "panel": "visita"
+    },
+    {
+     "name": "Altezza",
+     "value": "157",
+     "unit": "cm",
+     "reference": null,
+     "flag": null,
+     "number": 157,
+     "panel": "visita"
+    }
+   ],
+   "medications": [
+    {
+     "name": "Vitamina D",
+     "dose": "400 UI",
+     "schedule": "al giorno, mesi invernali"
+    }
+   ],
+   "follow_ups": [
+    {
+     "what": "controllo pediatrico",
+     "when": "fra 12 mesi"
+    }
+   ],
+   "amount": null,
+   "file": "pdf/tommaso-pediatra-2026-10-07.pdf",
+   "id": "tommaso-pediatra-2026-10-07",
+   "photo": "photo/tommaso-pediatra-2026-10-07.jpg"
+  },
+  {
+   "kind": "vaccination",
+   "language": "it",
+   "date": "2018-07-30",
+   "person": "tommaso",
+   "person_hint": "Tommaso Bellandi",
+   "issuer": "Studio Pediatrico Esempio",
+   "title": "Certificato delle vaccinazioni",
+   "values": [],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "vaccines": [
+    {
+     "name": "DTPa-IPV-Hib-HepB",
+     "date": "2014-08-21"
+    },
+    {
+     "name": "DTPa-IPV-Hib-HepB",
+     "date": "2014-10-21"
+    },
+    {
+     "name": "DTPa-IPV-Hib-HepB",
+     "date": "2015-06-21"
+    },
+    {
+     "name": "Pneumococco",
+     "date": "2014-08-21"
+    },
+    {
+     "name": "Pneumococco",
+     "date": "2014-10-21"
+    },
+    {
+     "name": "Pneumococco",
+     "date": "2015-06-21"
+    },
+    {
+     "name": "MPR",
+     "date": "2015-03-23"
+    },
+    {
+     "name": "MPR",
+     "date": "2015-06-22"
+    },
+    {
+     "name": "Varicella",
+     "date": "2015-06-22"
+    },
+    {
+     "name": "DTPa-IPV (richiamo)",
+     "date": "2018-07-30"
+    }
+   ],
+   "file": "pdf/tommaso-vaccinazioni.pdf",
+   "id": "tommaso-vaccinazioni",
+   "photo": "photo/tommaso-vaccinazioni.jpg"
+  },
+  {
+   "kind": "discharge",
+   "language": "it",
+   "date": "2025-06-28",
+   "person": "nonna",
+   "person_hint": "Adele Ferrante",
+   "issuer": "Ospedale Regionale Immaginario",
+   "title": "Lettera di dimissione",
+   "values": [],
+   "medications": [
+    {
+     "name": "Amoxicillina/acido clavulanico",
+     "dose": "1 g",
+     "schedule": "1 compressa ogni 12 ore per 4 giorni"
+    },
+    {
+     "name": "Lisinopril",
+     "dose": "10 mg",
+     "schedule": "1 compressa al mattino"
+    },
+    {
+     "name": "Paracetamolo",
+     "dose": "1 g",
+     "schedule": "al bisogno, massimo 3 volte al giorno"
+    }
+   ],
+   "follow_ups": [
+    {
+     "what": "visita dal medico curante",
+     "when": "entro 7 giorni"
+    },
+    {
+     "what": "radiografia del torace di controllo",
+     "when": "fra 6 settimane"
+    }
+   ],
+   "amount": null,
+   "file": "pdf/adele-dimissione-2025-06-28.pdf",
+   "id": "adele-dimissione-2025-06-28",
+   "photo": "photo/adele-dimissione-2025-06-28.jpg"
+  },
+  {
+   "kind": "invoice",
+   "language": "it",
+   "date": "2025-07-23",
+   "person": "nonna",
+   "person_hint": "Adele Ferrante",
+   "issuer": "Ospedale Regionale Immaginario",
+   "title": "Fattura",
+   "values": [],
+   "medications": [],
+   "follow_ups": [],
+   "amount": {
+    "total": 2788.3,
+    "currency": "CHF"
+   },
+   "file": "pdf/adele-fattura-ospedale-2025-07-23.pdf",
+   "id": "adele-fattura-ospedale-2025-07-23",
+   "photo": "photo/adele-fattura-ospedale-2025-07-23.jpg"
+  },
+  {
+   "kind": "imaging_report",
+   "language": "it",
+   "date": "2026-01-14",
+   "person": "nonna",
+   "person_hint": "Adele Ferrante",
+   "issuer": "Istituto di Radiologia Esempio",
+   "title": "Referto radiologico",
+   "values": [],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/adele-rx-ginocchio-2026-01.pdf",
+   "id": "adele-rx-ginocchio-2026-01",
+   "photo": "photo/adele-rx-ginocchio-2026-01.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2024-12-02",
+   "person": "nonna",
+   "person_hint": "Adele Ferrante",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "14,9",
+     "unit": "g/dL",
+     "reference": "12.0 - 16.0",
+     "flag": null,
+     "number": 14.9,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "41,0",
+     "unit": "%",
+     "reference": "36 - 46",
+     "flag": null,
+     "number": 41.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "4,9",
+     "unit": "10^6/µL",
+     "reference": "4.0 - 5.2",
+     "flag": null,
+     "number": 4.9,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "7,5",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 7.5,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "277",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 277.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "101",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": "H",
+     "number": 101.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Glicemia",
+     "value": "93",
+     "unit": "mg/dL",
+     "reference": "70 - 99",
+     "flag": null,
+     "number": 93.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Emoglobina glicata (HbA1c)",
+     "value": "5,3",
+     "unit": "%",
+     "reference": "4.0 - 5.6",
+     "flag": null,
+     "number": 5.3,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Creatinina",
+     "value": "0,8",
+     "unit": "mg/dL",
+     "reference": "0.5 - 1.0",
+     "flag": null,
+     "number": 0.8,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Acido urico",
+     "value": "4,5",
+     "unit": "mg/dL",
+     "reference": "2.6 - 6.0",
+     "flag": null,
+     "number": 4.5,
+     "panel": "metabolico"
+    },
+    {
+     "name": "ALT (GPT)",
+     "value": "22",
+     "unit": "U/L",
+     "reference": "< 33",
+     "flag": null,
+     "number": 22.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "AST (GOT)",
+     "value": "20",
+     "unit": "U/L",
+     "reference": "< 32",
+     "flag": null,
+     "number": 20.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Gamma GT",
+     "value": "21",
+     "unit": "U/L",
+     "reference": "< 40",
+     "flag": null,
+     "number": 21.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Colesterolo totale",
+     "value": "201",
+     "unit": "mg/dL",
+     "reference": "< 200",
+     "flag": "H",
+     "number": 201.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo HDL",
+     "value": "70",
+     "unit": "mg/dL",
+     "reference": "> 50",
+     "flag": null,
+     "number": 70.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo LDL",
+     "value": "106",
+     "unit": "mg/dL",
+     "reference": "< 130",
+     "flag": null,
+     "number": 106.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Trigliceridi",
+     "value": "104",
+     "unit": "mg/dL",
+     "reference": "< 150",
+     "flag": null,
+     "number": 104.0,
+     "panel": "lipidi"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/adele-lab-2024-12-02.pdf",
+   "id": "adele-lab-2024-12-02",
+   "photo": "photo/adele-lab-2024-12-02.jpg"
+  },
+  {
+   "kind": "lab_report",
+   "language": "it",
+   "date": "2025-12-06",
+   "person": "nonna",
+   "person_hint": "Adele Ferrante",
+   "issuer": "Laboratorio Analisi Demo SA",
+   "title": "Referto esami di laboratorio",
+   "values": [
+    {
+     "name": "Emoglobina",
+     "value": "13,6",
+     "unit": "g/dL",
+     "reference": "12.0 - 16.0",
+     "flag": null,
+     "number": 13.6,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Ematocrito",
+     "value": "43,0",
+     "unit": "%",
+     "reference": "36 - 46",
+     "flag": null,
+     "number": 43.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Eritrociti",
+     "value": "5,0",
+     "unit": "10^6/µL",
+     "reference": "4.0 - 5.2",
+     "flag": null,
+     "number": 5.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Leucociti",
+     "value": "7,0",
+     "unit": "10^3/µL",
+     "reference": "4.0 - 10.0",
+     "flag": null,
+     "number": 7.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Piastrine",
+     "value": "281",
+     "unit": "10^3/µL",
+     "reference": "150 - 400",
+     "flag": null,
+     "number": 281.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "MCV",
+     "value": "94",
+     "unit": "fL",
+     "reference": "80 - 99",
+     "flag": null,
+     "number": 94.0,
+     "panel": "emocromo"
+    },
+    {
+     "name": "Glicemia",
+     "value": "100",
+     "unit": "mg/dL",
+     "reference": "70 - 99",
+     "flag": "H",
+     "number": 100.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Emoglobina glicata (HbA1c)",
+     "value": "6,1",
+     "unit": "%",
+     "reference": "4.0 - 5.6",
+     "flag": "H",
+     "number": 6.1,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Creatinina",
+     "value": "0,8",
+     "unit": "mg/dL",
+     "reference": "0.5 - 1.0",
+     "flag": null,
+     "number": 0.8,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Acido urico",
+     "value": "4,4",
+     "unit": "mg/dL",
+     "reference": "2.6 - 6.0",
+     "flag": null,
+     "number": 4.4,
+     "panel": "metabolico"
+    },
+    {
+     "name": "ALT (GPT)",
+     "value": "24",
+     "unit": "U/L",
+     "reference": "< 33",
+     "flag": null,
+     "number": 24.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "AST (GOT)",
+     "value": "19",
+     "unit": "U/L",
+     "reference": "< 32",
+     "flag": null,
+     "number": 19.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Gamma GT",
+     "value": "21",
+     "unit": "U/L",
+     "reference": "< 40",
+     "flag": null,
+     "number": 21.0,
+     "panel": "metabolico"
+    },
+    {
+     "name": "Colesterolo totale",
+     "value": "196",
+     "unit": "mg/dL",
+     "reference": "< 200",
+     "flag": null,
+     "number": 196.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo HDL",
+     "value": "63",
+     "unit": "mg/dL",
+     "reference": "> 50",
+     "flag": null,
+     "number": 63.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Colesterolo LDL",
+     "value": "116",
+     "unit": "mg/dL",
+     "reference": "< 130",
+     "flag": null,
+     "number": 116.0,
+     "panel": "lipidi"
+    },
+    {
+     "name": "Trigliceridi",
+     "value": "120",
+     "unit": "mg/dL",
+     "reference": "< 150",
+     "flag": null,
+     "number": 120.0,
+     "panel": "lipidi"
+    }
+   ],
+   "medications": [],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/adele-lab-2025-12-06.pdf",
+   "id": "adele-lab-2025-12-06",
+   "photo": "photo/adele-lab-2025-12-06.jpg"
+  },
+  {
+   "kind": "prescription",
+   "language": "it",
+   "date": "2025-07-08",
+   "person": "nonna",
+   "person_hint": "Adele Ferrante",
+   "issuer": "Dr.ssa Elena Prova, medicina generale",
+   "title": "Ricetta medica",
+   "values": [],
+   "medications": [
+    {
+     "name": "Lisinopril",
+     "dose": "10 mg",
+     "schedule": "1 compressa al mattino"
+    },
+    {
+     "name": "Calcio + Vitamina D3",
+     "dose": "500 mg / 400 UI",
+     "schedule": "1 compressa al giorno"
+    }
+   ],
+   "follow_ups": [],
+   "amount": null,
+   "file": "pdf/adele-ricetta-2025-07-08.pdf",
+   "id": "adele-ricetta-2025-07-08",
+   "photo": "photo/adele-ricetta-2025-07-08.jpg"
+  }
+ ],
+ "note": "All names, issuers, numbers and dates are invented for demonstration."
+}
