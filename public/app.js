@@ -178,7 +178,60 @@ function renderHome() {
   const docs = el('section', { class: 'card' },
     el('h2', {}, t('timeline.title'), el('span', { class: 'sub', text: t('people.docs', { n: state.docs.length }) })),
     state.docs.length ? el('ul', { class: 'list' }, state.docs.slice(0, 60).map(docItem)) : el('p', { class: 'empty', text: t('timeline.empty') }));
-  return [people, docs];
+  return [hero(), people, docs];
+}
+
+// The welcome block: title, what it does in one sentence, the numbers, three steps
+function hero() {
+  const c = state.status?.counts ?? {};
+  const filed = c.documents?.filed ?? 0;
+  const toReview = state.docs.filter((d) => d.state === 'review' || d.state === 'failed').length;
+  const stat = (n, key) => el('div', { class: 'stat' }, el('span', { class: 'num', text: fmtNumber(n) }), el('span', { class: 'lbl', text: t(key) }));
+  const step = (icon, title, text) => el('li', { class: 'step' }, el('span', { class: 'ic' }, icon), el('span', { class: 'st', text: t(title) }), el('span', { class: 'sd', text: t(text) }));
+  return el('section', { class: 'hero' },
+    el('div', { class: 'hero-text' },
+      el('h1', { text: t('hero.title') }),
+      el('p', { class: 'lead', text: t('hero.lead') }),
+      el('div', { class: 'hero-actions' },
+        el('a', { class: 'btn', href: '#/add' }, iconCamera(), t('hero.cta')),
+        toReview ? el('a', { class: 'btn ghost', href: '#/review', text: t('hero.review', { n: toReview }) }) : null),
+      el('div', { class: 'stats' }, stat(filed, 'hero.stat.docs'), stat(c.people ?? state.people.length, 'hero.stat.people'), stat(c.measurements ?? 0, 'hero.stat.values'))),
+    el('div', { class: 'hero-art', 'aria-hidden': 'true' }, illustration()),
+    el('ol', { class: 'steps' },
+      step(iconCamera(), 'hero.step1', 'hero.step1d'),
+      step(iconCheck(), 'hero.step2', 'hero.step2d'),
+      step(iconChart(), 'hero.step3', 'hero.step3d')));
+}
+
+const stroke = { fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+const iconCamera = () => svg('svg', { viewBox: '0 0 24 24', width: 20, height: 20, 'aria-hidden': 'true' }, svg('path', { ...stroke, d: 'M4 8h3l1.6-2.4h6.8L17 8h3v11H4z' }), svg('circle', { ...stroke, cx: 12, cy: 13.2, r: 3.4 }));
+const iconCheck = () => svg('svg', { viewBox: '0 0 24 24', width: 20, height: 20, 'aria-hidden': 'true' }, svg('path', { ...stroke, d: 'M6 3h9l4 4v14H6z' }), svg('path', { ...stroke, d: 'M9 13.5l2.2 2.2L15.5 11' }));
+const iconChart = () => svg('svg', { viewBox: '0 0 24 24', width: 20, height: 20, 'aria-hidden': 'true' }, svg('path', { ...stroke, d: 'M4 4v16h16' }), svg('path', { ...stroke, d: 'M7.5 15l3.5-4 3 2.5 4.5-6' }));
+
+/** A small house holding a stack of documents, a value chart and a check: drawn here, no image files. */
+function illustration() {
+  const S = (tag, a, ...c) => svg(tag, a, ...c);
+  return S('svg', { viewBox: '0 0 320 240', class: 'art' },
+    // ground and house
+    S('ellipse', { cx: 160, cy: 214, rx: 130, ry: 12, class: 'a-shadow' }),
+    S('path', { d: 'M52 112 L160 34 L268 112', class: 'a-roof' }),
+    S('rect', { x: 72, y: 104, width: 176, height: 108, rx: 10, class: 'a-house' }),
+    // back document with a chart
+    S('g', { transform: 'rotate(-8 128 150)' },
+      S('rect', { x: 92, y: 96, width: 86, height: 108, rx: 7, class: 'a-paper' }),
+      S('rect', { x: 104, y: 110, width: 46, height: 6, rx: 3, class: 'a-ink' }),
+      S('rect', { x: 104, y: 166, width: 62, height: 14, rx: 3, class: 'a-band' }),
+      S('path', { d: 'M104 186 L120 162 L136 172 L152 140 L166 150', class: 'a-line' }),
+      S('circle', { cx: 152, cy: 140, r: 4, class: 'a-dot' })),
+    // front document with rows and a check
+    S('g', { transform: 'rotate(5 196 156)' },
+      S('rect', { x: 150, y: 100, width: 92, height: 114, rx: 7, class: 'a-paper' }),
+      S('rect', { x: 162, y: 114, width: 52, height: 7, rx: 3.5, class: 'a-ink strong' }),
+      ...[132, 146, 160, 174].map((y, i) => S('g', {}, S('rect', { x: 162, y, width: 40, height: 5, rx: 2.5, class: 'a-ink' }), S('rect', { x: 210, y, width: i === 1 ? 20 : 16, height: 5, rx: 2.5, class: i === 1 ? 'a-flag' : 'a-ink' }))),
+      S('circle', { cx: 222, cy: 196, r: 13, class: 'a-check-bg' }),
+      S('path', { d: 'M215 196 l5 5 l9 -10', class: 'a-check' })),
+    // a small heart above the door line
+    S('path', { d: 'M160 74 c-6 -8 -18 -3 -14 6 c2 5 8 9 14 13 c6 -4 12 -8 14 -13 c4 -9 -8 -14 -14 -6 z', class: 'a-heart' }));
 }
 
 function addPersonDialog() {
