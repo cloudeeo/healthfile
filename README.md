@@ -79,6 +79,22 @@ The `qvac serve` aliases this expects, in `serve.models` of `qvac.config.json`:
 "embgemma":  { "type": "llamacpp-embedding", "src": "/path/embeddinggemma-300M-Q8_0.gguf", "preload": true, "config": { "device": "cpu" } }
 ```
 
+## Importing a folder
+
+To load many documents at once without the page, point the import script at
+a folder on the server; it walks subfolders, sends every PDF and photo, and
+skips files already in the archive (the server compares SHA-256), so it can
+be run again after adding files:
+
+```sh
+node scripts/import-folder.mjs ~/scansioni/salute              # the reader guesses each person from the printed name
+node scripts/import-folder.mjs ~/scansioni/marco --person "Marco Bellandi"
+node scripts/import-folder.mjs ~/scansioni --dry-run            # list only
+node scripts/import-folder.mjs ~/scansioni --wait               # and print what was read
+```
+
+Documents land in "To review"; nothing is filed without a look.
+
 ## How a document is read
 
 1. The upload is saved as it came (never modified). PDF pages are rendered at 150 dpi; photos are auto-oriented and resized to 1600 px on the long side. A 1200 px preview per page is kept for the screen.
@@ -90,7 +106,7 @@ The `qvac serve` aliases this expects, in `serve.models` of `qvac.config.json`:
 
 - `GET /api/status`: counts, the models and their state, `outboundCalls: 0`.
 - `GET|POST /api/people`, `GET|PATCH|DELETE /api/people/:id`, `GET /api/people/:id/analytes`, `GET /api/people/:id/series/:analyte`.
-- `POST /api/documents` with the file as the body, `X-File-Name` and optional `X-Person-Id` headers; `202` with the document in state `reading`.
+- `POST /api/documents` with the file as the body, `X-File-Name` and optional `X-Person-Id` headers; `202` with the document in state `reading`, `409` with the existing document when the same file is already in the archive.
 - `GET /api/documents?person=&state=&kind=`, `GET /api/documents/:id` (with pages, measurements, items), `PATCH` (review edits), `POST /api/documents/:id/confirm`, `POST /api/documents/:id/reread`, `DELETE`.
 - `GET /api/documents/:id/page-<n>.jpg`, `GET /api/documents/:id/original`.
 

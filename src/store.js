@@ -95,6 +95,10 @@ export class Store {
   constructor(file = ':memory:') {
     this.db = new DatabaseSync(file);
     this.db.exec(SCHEMA);
+    // v0.1.1: the original's SHA-256, to refuse the same file twice (also on databases made before it)
+    const cols = this.db.prepare('PRAGMA table_info(documents)').all().map((c) => c.name);
+    if (!cols.includes('sha256')) this.db.exec('ALTER TABLE documents ADD COLUMN sha256 TEXT');
+    this.db.exec('CREATE INDEX IF NOT EXISTS documents_sha256 ON documents(sha256)');
   }
 
   close() {
@@ -131,12 +135,18 @@ export class Store {
 
   // Documents ----------------------------------------------------------------
 
-  createDocument({ originalName, originalType, originalBytes, personId = null }) {
+  /** A document with this original file, if any. */
+  findBySha256(sha256) {
+    const d = this.db.prepare('SELECT id FROM documents WHERE sha256 = ? LIMIT 1').get(sha256);
+    return d ? this.getDocument(d.id) : null;
+  }
+
+  createDocument({ originalName, originalType, originalBytes, personId = null, sha256 = null }) {
     const t = nowIso();
     const d = { id: randomUUID(), state: 'reading', original_name: originalName, original_type: originalType, original_bytes: originalBytes, person_id: personId, created: t, updated: t };
     this.db
-      .prepare('INSERT INTO documents (id, person_id, state, original_name, original_type, original_bytes, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-      .run(d.id, d.person_id, d.state, d.original_name, d.original_type, d.original_bytes, d.created, d.updated);
+      .prepare('INSERT INTO documents (id, person_id, state, original_name, original_type, original_bytes, sha256, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(d.id, d.person_id, d.state, d.original_name, d.original_type, d.original_bytes, sha256, d.created, d.updated);
     return this.getDocument(d.id);
   }
 

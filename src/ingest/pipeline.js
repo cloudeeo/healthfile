@@ -4,6 +4,7 @@
 // polls the document's state. Logs carry ids, counts and timings only.
 
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { renderPages, imageSize, sniff, ACCEPTED } from './pages.js';
 import { readPage, mergePages } from './reader.js';
 
@@ -40,7 +41,10 @@ export class Ingestor {
     const mime = sniff(buffer) ?? (ACCEPTED[type] ? type : null);
     if (!mime || !ACCEPTED[mime]) return { ok: false, status: 415, error: 'send a PDF, JPEG, PNG, WebP or HEIC' };
     if (personId && !this.store.getPerson(personId)) return { ok: false, status: 400, error: 'unknown person' };
-    const doc = this.store.createDocument({ originalName: String(name || 'document').slice(0, 200), originalType: mime, originalBytes: buffer.length, personId });
+    const sha256 = createHash('sha256').update(buffer).digest('hex');
+    const same = this.store.findBySha256(sha256);
+    if (same) return { ok: false, status: 409, error: 'this file is already in the archive', document: same };
+    const doc = this.store.createDocument({ originalName: String(name || 'document').slice(0, 200), originalType: mime, originalBytes: buffer.length, personId, sha256 });
     const dir = this.docDir(doc.id);
     await this.deps.mkdir(dir);
     await this.deps.writeFile(join(dir, `original.${ACCEPTED[mime]}`), buffer, { mode: 0o600 });
@@ -69,8 +73,8 @@ export class Ingestor {
         const file = join(dir, `page-${p}.jpg`);
         const size = await imageSize(this.deps, file);
         const dataUrl = `data:image/jpeg;base64,${(await this.deps.readFile(file)).toString('base64')}`;
-        this.deps.setHint?.(`${doc.originalName} page ${p}`); // mock mode only: which page is being read
         const release = await this.queue.acquire(this.config.qvac.reader, { signal: ctrl.signal });
+        this.deps.setHint?.(`${doc.originalName} page ${p}`); // mock mode only: which page is being read (set inside the slot)
         let r;
         try {
           r = await readPage({ qvac: this.config.qvac, deps: this.deps, dataUrl, timeoutMs: this.config.ingest.readerTimeoutMs, signal: ctrl.signal });

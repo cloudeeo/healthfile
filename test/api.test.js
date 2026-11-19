@@ -136,6 +136,13 @@ test('upload checks: empty, wrong type, too big, unknown person; a photo is read
   assert.match(bd.error, /converted|read/);
 });
 
+test('the same file twice is refused with 409 and the existing document', async () => {
+  const pdf = await readFile(new URL('../corpus/pdf/marco-lab-2025-09-05.pdf', import.meta.url));
+  const again = await j('/api/documents', { method: 'POST', headers: { 'Content-Type': 'application/pdf', 'X-File-Name': 'copy.pdf' }, body: pdf });
+  assert.equal(again.status, 409);
+  assert.equal(again.body.document.id, doc.id);
+});
+
 test('delete removes rows and files; unknown ids are 404', async () => {
   const del = await j(`/api/documents/${doc.id}`, { method: 'DELETE' });
   assert.equal(del.body.ok, true);

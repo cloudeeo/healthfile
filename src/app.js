@@ -248,7 +248,7 @@ export function createHandler({ config, store, ingestor, deps, search }) {
           const name = decodeURIComponent(req.headers['x-file-name'] || 'document');
           const personId = str(req.headers['x-person-id'], 36);
           const r = await ingestor.accept({ buffer, name, type: req.headers['content-type']?.split(';')[0], personId });
-          if (!r.ok) return sendJson(res, r.status, { error: r.error });
+          if (!r.ok) return sendJson(res, r.status, { error: r.error, ...(r.document ? { document: { id: r.document.id, state: r.document.state, title: r.document.title } } : {}) });
           return sendJson(res, 202, r.document);
         }
         return send(res, 405, 'method not allowed', { Allow: 'GET, POST', 'Content-Type': 'text/plain' });
