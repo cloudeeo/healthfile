@@ -23,17 +23,38 @@ export const READER_PROMPT = `Read this page of a document and answer with ONE J
   "follow_ups": appointments or checks the document asks for: [{ "what", "when" }], else [],
   "amount": for an invoice or a reimbursement statement: { "total": number, "currency": "CHF" | "EUR" | ... } or null
 }
-Rules: copy numbers, units and ranges exactly as printed, including the decimal mark; do not translate; do not summarise; if a part is unreadable write "[illegible]"; JSON only.`;
+Rules: numeric dates on these documents are day first, as in Europe: 06.12.2025 and 06/12/2025 are 6 December 2025 ("2025-12-06"); copy numbers, units and ranges exactly as printed, including the decimal mark; do not translate; do not summarise; if a part is unreadable write "[illegible]"; JSON only.`;
 
 export const REPAIR_PROMPT = 'The following text was meant to be one JSON object with the keys language, kind, date, person_hint, issuer, title, text, values, medications, follow_ups, amount. Return the same content as valid JSON and nothing else. Do not change any value.\n\n';
 
 const LANGS = new Set(['it', 'fr', 'en', 'de', 'other']);
 
+/**
+ * European documents write dates day first. The model sometimes reads
+ * "06.12.2025" as June 12 (seen on omen01 with Qwen3.5-4B). When the page's
+ * own transcription has the date only in the order that matches a month-first
+ * reading, swap day and month back; when both orders appear, or neither,
+ * trust the model.
+ */
+export function dayFirst(iso, text) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? '');
+  if (!m || !text) return iso;
+  const [, y, mo, d] = m;
+  if (mo === d || Number(d) > 12) return iso;
+  const printed = (a, b) => new RegExp(`(^|[^0-9])0?${Number(a)}[./-]0?${Number(b)}[./-](${y}|${y.slice(2)})([^0-9]|$)`).test(text);
+  // as the model read it, day first: d.mo.y; the misreading shows as mo.d.y on the page
+  const asRead = printed(d, mo);
+  const swapped = printed(mo, d);
+  return swapped && !asRead ? `${y}-${d}-${mo}` : iso;
+}
+
 /** Make what the model returned safe to store: known keys, right types, nothing else. */
 export function normalisePage(raw) {
   const o = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const str = (v, max = 400) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
-  const date = typeof o.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.date.trim()) ? o.date.trim() : null;
+  const text = typeof o.text === 'string' ? o.text.trim().slice(0, 40_000) : '';
+  const read = typeof o.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.date.trim()) ? o.date.trim() : null;
+  const date = dayFirst(read, text);
   const kind = KINDS.includes(o.kind) ? o.kind : 'other';
   const language = LANGS.has(o.language) ? o.language : 'other';
   const arr = (v) => (Array.isArray(v) ? v : []);
@@ -57,7 +78,7 @@ export function normalisePage(raw) {
     personHint: str(o.person_hint, 120),
     issuer: str(o.issuer, 160),
     title: str(o.title, 80),
-    text: typeof o.text === 'string' ? o.text.trim().slice(0, 40_000) : '',
+    text,
     values,
     medications,
     followUps,

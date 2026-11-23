@@ -101,3 +101,22 @@ test('guessPerson: exactly one match on all name parts', () => {
   assert.equal(guessPerson(people, 'Bellandi'), null, 'two Bellandi: no guess');
   assert.equal(guessPerson(people, null), null);
 });
+
+import { dayFirst } from '../src/ingest/reader.js';
+
+test('dates: a day-first date read month first is put back, from the page text', () => {
+  // the omen01 case: "Data prelievo: 06.12.2025" read as 2025-06-12
+  assert.equal(dayFirst('2025-06-12', 'Nato/a il: 30.08.1951\nData prelievo: 06.12.2025'), '2025-12-06');
+  assert.equal(dayFirst('2025-06-12', 'Data: 6/12/25'), '2025-12-06');
+  // read right: unchanged
+  assert.equal(dayFirst('2025-12-06', 'Data prelievo: 06.12.2025'), '2025-12-06');
+  // both orders on the page, or none: the model is trusted
+  assert.equal(dayFirst('2025-06-12', 'Prelievo 06.12.2025, stampato 12.06.2025'), '2025-06-12');
+  assert.equal(dayFirst('2025-06-12', 'no dates here'), '2025-06-12');
+  // no ambiguity possible
+  assert.equal(dayFirst('2025-10-28', 'Data: 28.10.2025'), '2025-10-28');
+  assert.equal(dayFirst('2025-05-05', '05.05.2025'), '2025-05-05');
+  assert.equal(dayFirst(null, 'x'), null);
+  // a longer number around it is not a date
+  assert.equal(dayFirst('2025-06-12', 'Rif. 106.12.20251'), '2025-06-12');
+});
