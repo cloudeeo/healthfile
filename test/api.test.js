@@ -55,6 +55,8 @@ test('people: add, list, validate, update', async () => {
   await j('/api/people', { method: 'POST', body: { name: 'Giulia Ferrante' } });
   const list = await j('/api/people');
   assert.equal(list.body.people.length, 2);
+  // added without a colour: one from the palette, a different one for each person
+  assert.deepEqual(list.body.people.map((p) => p.color), ['#2f6fed', '#d9480f']);
   const up = await j(`/api/people/${marco.id}`, { method: 'PATCH', body: { color: '#2f6fed' } });
   assert.equal(up.body.color, '#2f6fed');
   assert.equal((await j('/api/people/00000000-0000-0000-0000-000000000000')).status, 404);

@@ -90,6 +90,9 @@ CREATE INDEX IF NOT EXISTS chunks_document ON chunks(document_id);
 
 const nowIso = () => new Date().toISOString();
 
+/** The avatar colours, in the order people are added (the page uses the same list). */
+export const PERSON_COLORS = ['#2f6fed', '#d9480f', '#2b8a3e', '#862e9c', '#c92a2a', '#0b7285'];
+
 export class Store {
   /** @param {string} file  path of the database, or ':memory:' */
   constructor(file = ':memory:') {
@@ -116,6 +119,8 @@ export class Store {
   }
 
   addPerson({ name, born = null, color = null }) {
+    // no colour given (the API, the corpus scripts): the next one of the page's palette
+    if (!color) color = PERSON_COLORS[this.listPeople().length % PERSON_COLORS.length];
     const p = { id: randomUUID(), name: String(name).trim(), born, color, created: nowIso() };
     this.db.prepare('INSERT INTO people (id, name, born, color, created) VALUES (?, ?, ?, ?, ?)').run(p.id, p.name, p.born, p.color, p.created);
     return p;

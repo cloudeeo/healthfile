@@ -136,6 +136,9 @@ function paintChrome() {
 }
 
 const personOf = (id) => state.people.find((p) => p.id === id) || null;
+const PERSON_COLORS = ['#2f6fed', '#d9480f', '#2b8a3e', '#862e9c', '#c92a2a', '#0b7285'];
+/** A person's avatar colour; people added without one get theirs from the palette, by position. */
+const colorOf = (p) => p.color || PERSON_COLORS[Math.max(0, state.people.findIndex((x) => x.id === p.id)) % PERSON_COLORS.length];
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
 const kindName = (k) => t(`kind.${k || 'other'}`);
 
@@ -183,7 +186,7 @@ function renderHome() {
     el('h2', {}, t('people.title')),
     el('div', { class: 'people' },
       state.people.map((p) => el('a', { class: 'person', href: `#/person/${p.id}` },
-        el('span', { class: 'av', style: { background: p.color || '#6b7884' }, text: initials(p.name) }),
+        el('span', { class: 'av', style: { background: colorOf(p) }, text: initials(p.name) }),
         el('span', { class: 'n', text: p.name }),
         el('span', { class: 'm' }, p.born ? fmtDate(p.born, { year: 'numeric' }) + ' · ' : '', t('people.docs', { n: counts[p.id] || 0 })))),
       el('button', { type: 'button', class: 'person add', onclick: () => addPersonDialog() }, '+ ', t('people.add'))),
@@ -256,7 +259,7 @@ function addPersonDialog() {
       e.preventDefault();
       if (!name.value.trim()) return;
       try {
-        await api('people', { method: 'POST', body: { name: name.value.trim(), born: born.value || null, color: ['#2f6fed', '#d9480f', '#2b8a3e', '#862e9c', '#c92a2a', '#0b7285'][state.people.length % 6] } });
+        await api('people', { method: 'POST', body: { name: name.value.trim(), born: born.value || null, color: PERSON_COLORS[state.people.length % PERSON_COLORS.length] } });
         await refresh();
         render();
       } catch (err) {
@@ -481,7 +484,7 @@ async function renderPerson({ id }) {
   paintList();
   const filter = el('select', { 'aria-label': t('timeline.filter'), onchange: (e) => ((kind = e.target.value), paintList()) }, el('option', { value: '', text: t('timeline.allKinds') }), [...new Set(docs.map((d) => d.kind))].map((k) => el('option', { value: k, text: kindName(k) })));
   const header = el('section', { class: 'card' },
-    el('h2', {}, el('span', { class: 'av small', style: { background: p.color || '#6b7884' }, text: initials(p.name) }), p.name, el('span', { class: 'sub' }, p.born ? fmtDate(p.born) + ' · ' : '', t('people.docs', { n: docs.length }))));
+    el('h2', {}, el('span', { class: 'av small', style: { background: colorOf(p) }, text: initials(p.name) }), p.name, el('span', { class: 'sub' }, p.born ? fmtDate(p.born) + ' · ' : '', t('people.docs', { n: docs.length }))));
   const values = el('section', { class: 'card' },
     el('h2', {}, t('values.title')),
     analytes.length ? el('div', { class: 'analytes' }, analytes.map((a) => {
