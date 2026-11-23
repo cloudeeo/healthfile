@@ -262,3 +262,5 @@ body.demo .brand::after {
   background: color-mix(in srgb, #9a5b00 10%, var(--surface));
   font-size: 14px;
 }
+.hero .engine { margin: 6px 0 14px; font-size: 13.5px; color: var(--ink-3); }
+.hero .engine a { color: var(--accent); font-weight: 600; }

@@ -197,6 +197,13 @@ function renderHome() {
   return [hero(), people, docs];
 }
 
+/** "Runs locally on QVAC: reads with qwen35-4b, searches with embgemma", with QVAC linked. */
+function engineLine(models) {
+  const text = t('hero.engine', { reader: models.reader.id, embedder: models.embedder?.id ?? '-' });
+  const [before, ...rest] = text.split('QVAC');
+  return el('p', { class: 'engine' }, before, el('a', { href: 'https://github.com/tetherto/qvac', target: '_blank', rel: 'noopener', text: 'QVAC' }), rest.join('QVAC'));
+}
+
 // The welcome block: title, what it does in one sentence, the numbers, three steps
 function hero() {
   const c = state.status?.counts ?? {};
@@ -208,6 +215,8 @@ function hero() {
     el('div', { class: 'hero-text' },
       el('h1', { text: t('hero.title') }),
       el('p', { class: 'lead', text: t('hero.lead') }),
+      // which QVAC models do the work, from the server's own status
+      state.status?.models?.reader ? engineLine(state.status.models) : null,
       el('div', { class: 'hero-actions' },
         el('a', { class: 'btn', href: '#/add' }, iconCamera(), t('hero.cta')),
         toReview ? el('a', { class: 'btn ghost', href: '#/review', text: t('hero.review', { n: toReview }) }) : null),
