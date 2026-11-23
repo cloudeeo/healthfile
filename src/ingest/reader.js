@@ -17,11 +17,11 @@ export const READER_PROMPT = `Read this page of a document and answer with ONE J
   "person_hint": the patient's or insured person's full name as printed, or null,
   "issuer": the laboratory, practice, hospital, pharmacy or insurer that produced it, or null,
   "title": a short title in the document's language (e.g. "Esami del sangue", "Lettera del pediatra", "Fattura"), max 60 characters,
-  "text": the full text of the page, transcribed faithfully, in reading order, with line breaks; tables as one row per line with " | " between cells,
   "values": every measured value printed with a number, one entry each: in a lab report every analyte; in a visit letter or a paediatric report also weight, height, blood pressure, heart rate, temperature and the like (never prices, amounts, invoice lines, dates or reference numbers): { "name": as printed, "value": as printed (e.g. "5,4" or "< 0.5"), "unit": as printed or null, "reference": the reference range as printed or null, "flag": "H" | "L" | null as printed }; [] when there are none,
   "medications": for a prescription or a letter that prescribes: [{ "name", "dose", "schedule" }], else [],
   "follow_ups": appointments or checks the document asks for: [{ "what", "when" }], else [],
-  "amount": for an invoice or a reimbursement statement: { "total": number, "currency": "CHF" | "EUR" | ... } or null
+  "amount": for an invoice or a reimbursement statement: { "total": number, "currency": "CHF" | "EUR" | ... } or null,
+  "text": the full text of the page, faithfully, in reading order: one line per printed line, table cells separated by " | ", never tabs and never more than one space in a row (do not reproduce the layout with spaces)
 }
 Rules: "lab_report" is only for laboratory results; a doctor's visit or specialist letter is "letter" even when it lists measurements; numeric dates on these documents are day first, as in Europe: 06.12.2025 and 06/12/2025 are 6 December 2025 ("2025-12-06"); copy numbers, units and ranges exactly as printed, including the decimal mark; do not translate; do not summarise; if a part is unreadable write "[illegible]"; JSON only.`;
 
@@ -75,7 +75,8 @@ export function splitBloodPressure(values, language) {
 export function normalisePage(raw) {
   const o = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const str = (v, max = 400) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
-  const text = typeof o.text === 'string' ? o.text.trim().slice(0, 40_000) : '';
+  // tabs and runs of spaces are layout, not text (a loop of tabs is how the reader once ran out of tokens)
+  const text = typeof o.text === 'string' ? o.text.replace(/\t+/g, ' | ').replace(/ {2,}/g, ' ').replace(/(?: \| )+$/gm, '').trim().slice(0, 40_000) : '';
   const read = typeof o.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.date.trim()) ? o.date.trim() : null;
   const date = dayFirst(read, text);
   const kind = KINDS.includes(o.kind) ? o.kind : 'other';
