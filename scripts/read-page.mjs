@@ -3,7 +3,7 @@
 // send it to the reader with the app's prompt, and print how the answer
 // starts and ends, its length and why it stopped. Nothing is stored.
 //
-//   node scripts/read-page.mjs corpus/pdf/marco-fattura-lab-2024-09.pdf [--temperature 0.3]
+//   node scripts/read-page.mjs corpus/pdf/marco-fattura-lab-2024-09.pdf [--temperature 0.3] [--no-stop]
 //
 // It prints the page's content: use it on the corpus or the demo, not on a
 // family's real documents in a shared terminal.
@@ -14,7 +14,7 @@ import { join, resolve } from 'node:path';
 import { loadConfig } from '../src/config.js';
 import { realDeps } from '../src/deps.js';
 import { renderPages, sniff } from '../src/ingest/pages.js';
-import { READER_SYSTEM, READER_PROMPT } from '../src/ingest/reader.js';
+import { READER_SYSTEM, READER_PROMPT, LOOP_STOPS, salvagePrefix } from '../src/ingest/reader.js';
 import { complete } from '../src/llm/client.js';
 
 const args = process.argv.slice(2);
@@ -46,6 +46,7 @@ try {
     maxTokens: 6000,
     temperature,
     timeoutMs: 600_000,
+    extra: args.includes('--no-stop') ? {} : { stop: LOOP_STOPS },
   });
   if (!r.ok) {
     console.log(`error: ${r.error}`);
@@ -55,6 +56,8 @@ try {
   console.log(`finish: ${r.finish}, ${c.length} characters, usage ${JSON.stringify(r.usage)}, ${((Date.now() - t0) / 1000).toFixed(1)} s`);
   console.log('\n--- first 1200 characters ---\n' + c.slice(0, 1200));
   if (c.length > 1200) console.log('\n--- last 800 characters ---\n' + c.slice(-800));
+  const cut = salvagePrefix(c);
+  if (cut) console.log(`\nkept before the transcription: kind ${cut.kind}, date ${cut.date}, ${cut.values?.length ?? 0} values, text ${cut.text?.length ?? 0} characters`);
 } finally {
   await rm(dir, { recursive: true, force: true });
 }

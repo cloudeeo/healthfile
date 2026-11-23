@@ -158,3 +158,34 @@ test('readPage: an answer cut off in a loop is read once more with a little samp
   assert.equal(bad.ok, false);
   assert.match(bad.error, /too long for the reader/);
 });
+
+test('readPage: a transcription that loops on tabs is stopped, and everything before it is kept', async () => {
+  // what qvac serve returned on omen01 for the lab invoice, stopped at the run of tabs
+  const answer = '```json\n{\n  "language": "it",\n  "kind": "invoice",\n  "date": "2024-09-21",\n  "person_hint": "Marco Bellandi",\n  "issuer": "Laboratorio Analisi Demo SA",\n  "title": "Fattura",\n  "values": [],\n  "medications": [],\n  "follow_ups": [],\n  "amount": { "total": 86.1, "currency": "CHF" },\n  "text": "Fattura\\nEmocromo completo\\t\\t\\t\\t\\t18.50\\nPrelievo\\t\\t\\t\\t\\t12.00\\n';
+  const deps = fakeDeps([answer]);
+  const r = await readPage({ qvac, deps, dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
+  assert.equal(r.ok, true);
+  assert.equal(r.partial, true);
+  assert.equal(deps.seen.length, 1, 'no second reading: everything that matters was before the text');
+  assert.ok(Array.isArray(deps.seen[0].stop) && deps.seen[0].stop[0].startsWith('\\t'));
+  assert.deepEqual([r.page.kind, r.page.date, r.page.personHint, r.page.amount.total], ['invoice', '2024-09-21', 'Marco Bellandi', 86.1]);
+  assert.equal(r.page.text, 'Fattura\nEmocromo completo | 18.50\nPrelievo | 12.00');
+});
+
+test('readPage: a server that refuses "stop" is asked again without it', async () => {
+  const seen = [];
+  const deps = {
+    now: () => Date.now(),
+    readFile: async () => 'key',
+    fetch: async (url, init) => {
+      const body = JSON.parse(init.body);
+      seen.push(body);
+      if (body.stop) return new Response('{"error":{"message":"unknown parameter: stop"}}', { status: 400 });
+      return Response.json({ choices: [{ message: { role: 'assistant', content: '{"kind":"letter","text":"ok"}' }, finish_reason: 'stop' }] });
+    },
+  };
+  const r = await readPage({ qvac, deps, dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
+  assert.equal(r.ok, true);
+  assert.equal(seen.length, 2);
+  assert.equal(seen[1].stop, undefined);
+});

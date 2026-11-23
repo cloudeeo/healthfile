@@ -119,48 +119,101 @@ export function normalisePage(raw) {
  * @param {string} o.dataUrl  the page as a data URL (JPEG/PNG)
  * @returns {Promise<{ ok: true, page: object, raw: object, ms: number, repaired: boolean } | { ok: false, error: string, ms: number }>}
  */
+// Stop generating at a run of tabs in the transcription: that is the loop
+// (Qwen3.5-4B right-aligning an invoice total, tab after tab, to the token
+// limit). "\\t" is how a tab looks inside the JSON string being written.
+export const LOOP_STOPS = ['\\t'.repeat(16), '\t'.repeat(16)];
+let stopRefused = false;
+
 export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
   const t0 = deps.now();
-  const ask = (temperature) =>
-    complete({
-      qvac,
-      deps,
-      model: qvac.reader,
-      messages: [
-        { role: 'system', content: READER_SYSTEM },
-        { role: 'user', content: [{ type: 'text', text: READER_PROMPT }, { type: 'image', dataUrl }] },
-      ],
-      maxTokens: 6000,
-      temperature,
-      timeoutMs,
-      signal,
-    });
+  const ask = async (temperature) => {
+    const call = (extra) =>
+      complete({
+        qvac,
+        deps,
+        model: qvac.reader,
+        messages: [
+          { role: 'system', content: READER_SYSTEM },
+          { role: 'user', content: [{ type: 'text', text: READER_PROMPT }, { type: 'image', dataUrl }] },
+        ],
+        maxTokens: 6000,
+        temperature,
+        timeoutMs,
+        signal,
+        extra,
+      });
+    if (stopRefused) return call({});
+    const r = await call({ stop: LOOP_STOPS });
+    // a server that does not take `stop` gets the request without it, from now on
+    if (!r.ok && r.status === 400 && /stop/i.test(r.error)) {
+      stopRefused = true;
+      return call({});
+    }
+    return r;
+  };
+  const done = (raw, extra = {}) => ({ ok: true, page: normalisePage(raw), raw, ms: deps.now() - t0, repaired: false, ...extra });
+
   let r = await ask(0);
   if (!r.ok) return { ok: false, error: r.error, ms: deps.now() - t0 };
-  // A short page that runs out of tokens is a loop (seen on omen01: an invoice
-  // listed over and over); a second reading with a little sampling breaks it.
-  if (r.finish === 'length' && !extractJson(r.content)) {
-    const again = await ask(0.3);
-    if (again.ok) r = again;
-  }
   let raw = extractJson(r.content);
-  let repaired = false;
-  if (!raw && r.finish === 'length') {
-    // still cut off in a loop: repairing 6000 tokens of repetition would loop too;
-    // keep the header fields written before the loop (kind, date, person,
-    // issuer, title) so the page goes to review, with nothing invented
-    const head = salvageHeader(r.content);
-    if (head) return { ok: true, page: normalisePage(head), raw: head, ms: deps.now() - t0, repaired: true, partial: true, finish: 'length' };
-    return { ok: false, error: 'the page is too long for the reader', ms: deps.now() - t0 };
+  if (raw) return done(raw, { finish: r.finish ?? null });
+
+  // Cut off in the transcription (stopped at the loop, or at the token limit):
+  // everything before "text" is complete, keep it and the text up to the loop.
+  let cut = salvagePrefix(r.content);
+  if (cut) return done(cut, { repaired: true, partial: true, finish: r.finish ?? null });
+
+  // Cut off at the token limit before "text": one more reading with a little sampling, which breaks most loops.
+  if (r.finish === 'length') {
+    const again = await ask(0.3);
+    if (again.ok) {
+      raw = extractJson(again.content);
+      if (raw) return done(raw, { repaired: true, finish: again.finish ?? null });
+      cut = salvagePrefix(again.content) ?? salvageHeader(again.content);
+      if (cut) return done(cut, { repaired: true, partial: true, finish: again.finish ?? null });
+    }
+    if (r.finish === 'length') {
+      const head = salvageHeader(r.content);
+      if (head) return done(head, { repaired: true, partial: true, finish: 'length' });
+      return { ok: false, error: 'the page is too long for the reader', ms: deps.now() - t0 };
+    }
   }
-  if (!raw) {
-    // a second pass with the text model, which only has to fix the JSON
-    const fix = await complete({ qvac, deps, model: qvac.writer, messages: [{ role: 'user', content: REPAIR_PROMPT + r.content.slice(0, 30_000) }], maxTokens: 6000, temperature: 0, timeoutMs, signal });
-    if (fix.ok) raw = extractJson(fix.content);
-    repaired = !!raw;
-    if (!raw) return { ok: false, error: 'the reader did not return JSON', ms: deps.now() - t0 };
+  // Not JSON at all: a second pass with the text model, which only has to fix it.
+  const fix = await complete({ qvac, deps, model: qvac.writer, messages: [{ role: 'user', content: REPAIR_PROMPT + r.content.slice(0, 30_000) }], maxTokens: 6000, temperature: 0, timeoutMs, signal });
+  raw = fix.ok ? extractJson(fix.content) : null;
+  if (raw) return done(raw, { repaired: true, finish: r.finish ?? null });
+  return { ok: false, error: 'the reader did not return JSON', ms: deps.now() - t0 };
+}
+
+/**
+ * An answer cut off inside "text" (the last key): parse everything before
+ * it, and keep the transcription up to where it started looping. Null when
+ * the cut came before "text".
+ */
+export function salvagePrefix(content) {
+  const c = String(content ?? '');
+  const start = c.indexOf('{');
+  const k = c.search(/"text"\s*:\s*"/);
+  if (start < 0 || k <= start) return null;
+  let head;
+  try {
+    head = JSON.parse(c.slice(start, k).replace(/,\s*$/, '') + '}');
+  } catch {
+    return null;
   }
-  return { ok: true, page: normalisePage(raw), raw, ms: deps.now() - t0, repaired, finish: r.finish ?? null };
+  if (!head || typeof head !== 'object' || !head.kind) return null;
+  // the text written before the loop: up to the first long run of tabs or spaces
+  let body = c.slice(c.indexOf('"', c.indexOf(':', k) + 1) + 1);
+  const loop = body.search(/(?:\\t){6,}|\t{6,}|(?:\\n){6,}| {12,}/);
+  body = loop >= 0 ? body.slice(0, loop) : body.replace(/"\s*}\s*(?:```)?\s*$/, '');
+  body = body.replace(/\\+$/, '');
+  try {
+    head.text = JSON.parse(`"${body}"`);
+  } catch {
+    head.text = body.replace(/\\n/g, '\n').replace(/\\t/g, ' ').replace(/\\"/g, '"');
+  }
+  return head;
 }
 
 /**
