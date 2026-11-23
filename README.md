@@ -41,7 +41,7 @@ OpenAI-compatible API on the same machine:
 
 ## How well it reads
 
-The whole corpus, PDF input, on omen01 (Qwen3.5-4B through `qvac serve`, RTX
+The whole corpus, PDF input, on the home server (omen01, Qwen3.5-4B through `qvac serve`, RTX
 3060), measured with [scripts/measure-extraction.mjs](scripts/measure-extraction.mjs)
 against the corpus' ground truth, 23 November 2026:
 
@@ -52,7 +52,7 @@ against the corpus' ground truth, 23 November 2026:
 | … with the reference range as printed | 164 / 170 |
 | date | 23 / 23 |
 | person (printed name) | 23 / 23 |
-| kind of document | 22 / 23 (the discharge letter read as a letter) |
+| kind of document | 22 / 23 (the discharge letter read as a letter; prompt fixed since, to re-measure) |
 | medications | 6 / 10 |
 | time per document | 6–10 s a letter, prescription or invoice; 13–31 s a full lab report |
 
@@ -105,6 +105,7 @@ embedding model and, later, MedPsy.
 git clone https://github.com/cloudeeo/healthfile && cd healthfile
 npm start                      # http://127.0.0.1:8097, data in ~/.local/share/healthfile
 MOCK=1 npm start               # no qvac serve: a fake reader answers from the corpus
+node scripts/load-corpus.mjs   # in another terminal: the fictional family's 23 documents, read and filed
 npm test
 ```
 
@@ -177,7 +178,7 @@ Documents land in "To review"; nothing is filed without a look.
 ## How a document is read
 
 1. The upload is saved as it came (never modified). PDF pages are rendered at 150 dpi; photos are auto-oriented and resized to 1600 px on the long side. A 1200 px preview per page is kept for the screen.
-2. Each page goes to the reader with one prompt that asks for a single JSON object: language, kind, date, the printed name, the issuer, a title, the full text transcribed faithfully, the lab values as printed (name, value, unit, reference, flag), medications, follow-ups, an amount. A second pass with the text model repairs answers that are not valid JSON.
+2. Each page goes to the reader with one prompt that asks for a single JSON object: language, kind, date, the printed name, the issuer, a title, every measured value as printed (lab results, and weight, height, blood pressure in letters: name, value, unit, reference, flag), medications, follow-ups, an amount, and last the full text transcribed. The answer is streamed: if the model starts repeating itself, the request is cut off and everything written before the loop is kept. A second pass with the text model repairs answers that are not valid JSON. A date read month first is put back when the page's own text shows it day first.
 3. Pages are merged; values are normalised (decimal comma, `< 0.5`, ranges `3.5 - 5.1`, `< 200`), matched to a table of about 60 common analytes with their Italian, French and English names so series line up across labs, and flagged against the reference when the lab printed no flag.
 4. The document waits for review: the page image beside the fields and a table of values, every cell editable, rows removable. Corrections are stored as such and count in the measurements. Confirming files the document and embeds its text for search.
 
@@ -193,10 +194,15 @@ Documents land in "To review"; nothing is filed without a look.
 
 `scripts/measure-extraction.mjs` uploads the synthetic corpus to a running
 instance, compares what was read with the ground truth field by field and
-value by value, deletes the documents and writes a Markdown report. Run it
-against the real reader on the server (`--pdf` for the PDFs, photos by
-default). Results go to `MEASUREMENTS.md` as they come, one run each,
-orders of magnitude rather than benchmarks.
+value by value, and writes a Markdown report (`measure-extraction-pdf.md` or
+`-photo.md`, with the misses per document). Documents it uploads are deleted
+afterwards; documents already in the archive (the demo after `reset-demo`)
+are measured as they were read and left alone. Run it against the real
+reader on the server (`--pdf` for the PDFs, photos by default). The latest
+run is in [How well it reads](#how-well-it-reads).
+
+`scripts/read-page.mjs <file>` reads one page the way the app does and shows
+how the model's answer starts and ends, why it stopped, and what the app keeps.
 
 ## Privacy
 
