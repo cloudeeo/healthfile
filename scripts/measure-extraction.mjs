@@ -5,6 +5,9 @@
 // the ground truth, and write a report. Nothing is confirmed: the documents
 // are deleted afterwards unless --keep.
 //
+// A document already in the archive (409, e.g. the demo after reset-demo) is
+// measured as it was read there, unless it was edited by hand, and left alone.
+//
 // Usage: node scripts/measure-extraction.mjs [--url http://127.0.0.1:8097] [--pdf] [--keep] [--out MEASUREMENTS-extraction.md] [--only marco-lab]
 
 import { readFile, writeFile } from 'node:fs/promises';
@@ -43,10 +46,23 @@ for (const d of truth.documents) {
   // the file name must not leak the answer to a real reader; the mock needs it, so keep it in mock mode only
   const name = status.mock ? rel.split('/').pop() : `doc-${rows.length + 1}.${rel.split('.').pop()}`;
   const res = await fetch(`${url}/api/documents`, { method: 'POST', headers: { 'Content-Type': type, 'X-File-Name': encodeURIComponent(name) }, body: buf });
-  const doc = await res.json();
-  if (!res.ok) {
+  let doc = await res.json();
+  // already in this archive (the demo, filled by reset-demo): measure that reading, and leave it there
+  let ours = true;
+  if (res.status === 409 && doc.document?.id) {
+    doc = await (await fetch(`${url}/api/documents/${doc.document.id}`)).json();
+    ours = false;
+    const touched = (doc.editedFields ?? []).filter((f) => f !== 'personId');
+    if (touched.length) {
+      rows.push({ id: d.id, error: `already in the archive, edited by hand (${touched.join(', ')})` });
+      totals.failed++;
+      console.log(`✗ ${d.id}: already in the archive and edited by hand, not measured`);
+      continue;
+    }
+  } else if (!res.ok) {
     rows.push({ id: d.id, error: doc.error });
     totals.failed++;
+    console.log(`✗ ${d.id}: ${doc.error}`);
     continue;
   }
   let cur = doc;
@@ -55,10 +71,11 @@ for (const d of truth.documents) {
     await sleep(1000);
     cur = await (await fetch(`${url}/api/documents/${doc.id}`)).json();
   }
-  if (cur.state !== 'review') {
+  if (cur.state !== 'review' && cur.state !== 'filed') {
     rows.push({ id: d.id, error: cur.error || cur.state });
     totals.failed++;
-    if (!keep) await fetch(`${url}/api/documents/${doc.id}`, { method: 'DELETE' });
+    console.log(`✗ ${d.id}: ${cur.error || cur.state}`);
+    if (!keep && ours) await fetch(`${url}/api/documents/${doc.id}`, { method: 'DELETE' });
     continue;
   }
   totals.docs++;
@@ -101,7 +118,7 @@ for (const d of truth.documents) {
   totals.medsFound += (d.medications ?? []).filter((m) => meds.some((x) => norm(x.name).includes(norm(m.name).split(' ')[0]))).length;
   rows.push(r);
   console.log(`${r.kind && r.date ? '✓' : '~'} ${d.id}: kind ${r.kindGot}${r.kind ? '' : ` (want ${d.kind})`}, date ${r.dateGot}${r.date ? '' : ` (want ${d.date})`}, values ${vt.number}/${vt.n} exact, ${vt.name}/${vt.n} found, +${got.length} extra, ${((r.ms ?? 0) / 1000).toFixed(1)} s`);
-  if (!keep) await fetch(`${url}/api/documents/${doc.id}`, { method: 'DELETE' });
+  if (!keep && ours) await fetch(`${url}/api/documents/${doc.id}`, { method: 'DELETE' });
 }
 
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(0)} %` : '-');

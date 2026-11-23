@@ -183,11 +183,14 @@ details > summary { cursor: pointer; font-weight: 600; margin: 6px 0; }
 .av.small { width: 30px; height: 30px; font-size: 13px; }
 
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; }
-.vals { min-width: 520px; }
-.vals td:nth-child(1) { min-width: 150px; }
-.vals td:nth-child(2) { min-width: 70px; }
-.vals td:nth-child(3) { min-width: 80px; }
-.vals td:nth-child(4) { min-width: 110px; }
+.vals { min-width: 400px; }
+.vals td:nth-child(1) { min-width: 116px; }
+.vals td:nth-child(2) { min-width: 56px; }
+.vals td:nth-child(3) { min-width: 72px; }
+.vals td:nth-child(4) { min-width: 96px; }
+/* the flag is one or two letters: keep its column narrow so it stays in view */
+.vals th:nth-child(5), .vals td:nth-child(5) { width: 2.6em; }
+.vals input.flag-in { width: 2.2em; padding: 5px 2px; text-align: center; }
 
 /* home: welcome block */
 .hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 8px 24px; align-items: center; padding: 22px 22px 18px; border-radius: 14px; border: 1px solid var(--rule);

@@ -18,6 +18,12 @@ test('analyteOf: Italian, French and English names map to one analyte; unknown s
 
 test('parseNumber and parseReference read what labs print', () => {
   assert.equal(parseNumber('5,4'), 5.4);
+  // a flag printed next to the number (seen on omen01: "27 *")
+  assert.equal(parseNumber('27 *'), 27);
+  assert.equal(parseNumber('8.1 H'), 8.1);
+  assert.equal(parseNumber('3,2↑'), 3.2);
+  assert.equal(parseNumber('-3'), -3);
+  assert.equal(analyteOf('Piastre')?.id ?? analyteOf('Piastre'), analyteOf('Piastrine')?.id ?? analyteOf('Piastrine'));
   assert.equal(parseNumber('< 0.5'), 0.5);
   assert.equal(parseNumber('negativo'), null);
   assert.equal(parseNumber(12), 12);

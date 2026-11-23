@@ -110,7 +110,9 @@ test('values: analyte summary and a series for the person', async () => {
   const pdf = await readFile(new URL('../corpus/pdf/marco-lab-2026-03-02.pdf', import.meta.url));
   const r = await j('/api/documents', { method: 'POST', headers: { 'Content-Type': 'application/pdf', 'X-File-Name': 'marco-lab-2026-03-02.pdf' }, body: pdf });
   const d2 = await waitRead(r.body.id);
-  await j(`/api/documents/${d2.id}/confirm`, { method: 'POST', body: {} });
+  // confirming with the person and values as read is not an edit
+  const c2 = await j(`/api/documents/${d2.id}/confirm`, { method: 'POST', body: { personId: d2.personId, measurements: d2.measurements } });
+  assert.deepEqual(c2.body.editedFields, []);
   const a = await j(`/api/people/${marco.id}/analytes`);
   const ldl = a.body.analytes.find((x) => x.analyte === 'ldl');
   assert.equal(ldl.points, 2);

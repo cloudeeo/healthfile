@@ -7,7 +7,7 @@ const TABLE = [
   ['hematocrit', 'Hematocrit', ['ematocrito', 'hct', 'ht', 'hématocrite', 'hematocrite', 'hematocrit']],
   ['rbc', 'Red blood cells', ['eritrociti', 'globuli rossi', 'rbc', 'gr', 'érythrocytes', 'erythrocytes', 'hématies', 'hematies', 'red blood cells']],
   ['wbc', 'White blood cells', ['leucociti', 'globuli bianchi', 'wbc', 'gb', 'leucocytes', 'white blood cells']],
-  ['platelets', 'Platelets', ['piastrine', 'plt', 'plaquettes', 'thrombocytes', 'platelets']],
+  ['platelets', 'Platelets', ['piastrine', 'piastre', 'plt', 'plaquettes', 'thrombocytes', 'platelets']],
   ['mcv', 'MCV', ['mcv', 'vcm', 'volume corpuscolare medio', 'vgm']],
   ['mch', 'MCH', ['mch', 'hcm', 'tcmh']],
   ['mchc', 'MCHC', ['mchc', 'chcm', 'ccmh']],
@@ -109,7 +109,8 @@ export function analyteOf(name) {
 /** "5,4" → 5.4; "< 0.5" → 0.5 (with the sign kept in `value`); "negativo" → null. */
 export function parseNumber(value) {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-  const s = String(value ?? '').trim().replace(/\s+/g, '');
+  // a flag printed next to the number ("27 *", "8.1 H", "3,2↑") is not part of it
+  const s = String(value ?? '').trim().replace(/\s*(\*+|[HL]|↑|↓|\(?[+-]\)?)$/u, '').replace(/\s+/g, '');
   const m = /^[<>≤≥]?\s*([-+]?\d+(?:[.,]\d+)?)$/.exec(s);
   if (!m) return null;
   return Number(m[1].replace(',', '.'));

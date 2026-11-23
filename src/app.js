@@ -160,10 +160,11 @@ export function createHandler({ config, store, ingestor, deps, search }) {
     if (!d) return { status: 404, body: { error: 'not found' } };
     const fields = {};
     const edited = new Set(d.editedFields ?? []);
+    // only what differs from what was read counts as edited by hand
     const set = (k, v, col = k) => {
       if (v === undefined) return;
       fields[col] = v;
-      edited.add(k);
+      if ((d[k] ?? null) !== (v ?? null)) edited.add(k);
     };
     if ('personId' in body) {
       if (body.personId !== null && !store.getPerson(body.personId)) return { status: 400, body: { error: 'unknown person' } };
@@ -189,8 +190,10 @@ export function createHandler({ config, store, ingestor, deps, search }) {
         if (typeof m.analyte === 'string' && m.analyte) row.analyte = m.analyte.slice(0, 40);
         rows.push({ ...row, id: typeof m.id === 'string' ? m.id : undefined, edited: !!m.edited });
       }
+      const key = (list) => JSON.stringify(list.map((r) => [r.name, r.value, r.unit ?? null, r.reference ?? null]));
+      const before = key(fullDocument(id).measurements ?? []);
       store.replaceMeasurements(id, rows);
-      edited.add('measurements');
+      if (key(fullDocument(id).measurements ?? []) !== before) edited.add('measurements');
     }
     fields.edited_fields = [...edited];
     store.updateDocument(id, fields);
