@@ -68,6 +68,8 @@ export class Ingestor {
       this.store.updateDocument(id, { pages: n });
       const pages = [];
       let repaired = 0;
+      // time spent reading, not waiting in the queue behind other documents
+      let readingMs = 0;
       for (let p = 1; p <= n; p++) {
         if (ctrl.signal.aborted) throw new Error('cancelled');
         const file = join(dir, `page-${p}.jpg`);
@@ -83,6 +85,7 @@ export class Ingestor {
         }
         if (!r.ok) throw new Error(`page ${p}: ${r.error}`);
         if (r.repaired) repaired++;
+        readingMs += r.ms ?? 0;
         this.store.putPage(id, p, { text: r.page.text, raw: r.raw, readerMs: r.ms, width: size?.width ?? null, height: size?.height ?? null });
         pages.push(r.page);
         this.log(`[ingest] ${id} page ${p}/${n} read in ${r.ms} ms${r.repaired ? ' (repaired)' : ''}`);
@@ -99,7 +102,7 @@ export class Ingestor {
         text: merged.text,
         person_hint: merged.personHint,
         reader_model: this.config.qvac.reader,
-        reader_ms: this.deps.now() - t0,
+        reader_ms: readingMs || this.deps.now() - t0,
         // keep a person the uploader chose; otherwise try to match the printed name
         person_id: current.personId ?? guessPerson(this.store.listPeople(), merged.personHint),
       });
@@ -107,7 +110,7 @@ export class Ingestor {
       this.store.replaceItems(id, 'medication', merged.medications);
       this.store.replaceItems(id, 'follow_up', merged.followUps);
       this.store.replaceItems(id, 'amount', merged.amount ? [merged.amount] : []);
-      this.log(`[ingest] ${id}: ${n} page(s), ${merged.measurements.length} value(s), ${this.deps.now() - t0} ms${repaired ? `, ${repaired} repaired` : ''}`);
+      this.log(`[ingest] ${id}: ${n} page(s), ${merged.measurements.length} value(s), read in ${readingMs} ms, ${this.deps.now() - t0} ms with the wait${repaired ? `, ${repaired} repaired` : ''}`);
     } catch (e) {
       const msg = String(e?.message || e).slice(0, 300);
       this.store.updateDocument(id, { state: msg === 'cancelled' ? 'failed' : 'failed', error: msg });
