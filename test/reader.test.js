@@ -217,3 +217,12 @@ test('readPage: a streamed answer is cut off as soon as the tabs start, and what
   assert.ok(sent < 40, `stopped after ${sent} chunks, not 400`);
   assert.deepEqual([r.page.kind, r.page.amount.total, r.page.text], ['invoice', 86.1, 'Fattura\nPrelievo 12.00']);
 });
+
+import { repeats } from '../src/ingest/reader.js';
+
+test('repeats: a block written over and over is a loop; ordinary text is not', () => {
+  assert.equal(repeats('Visita del ' + 'Peso 38 kg, altezza 145 cm. '.repeat(12)), true);
+  assert.equal(repeats('{"text":"ok' + '\\n'.repeat(150)), true);
+  assert.equal(repeats('Emoglobina 13,4 g/dL 12.0 - 16.0\nEmatocrito 38,2 % 36 - 46\n'.repeat(2) + 'Leucociti 6,5'), false);
+  assert.equal(repeats('-'.repeat(80) + '\nTotale CHF 86.10'), false);
+});

@@ -104,7 +104,9 @@ for (const d of truth.documents) {
     const okNum = numOf(g.value) != null && Math.abs(numOf(g.value) - v.number) < 1e-9;
     vt.number += okNum;
     vt.unit += norm(g.unit).replace(/\s/g, '') === norm(v.unit).replace(/\s/g, '');
-    vt.ref += norm(g.reference).replace(/\s/g, '') === norm(v.reference).replace(/\s/g, '');
+    const okRef = norm(g.reference).replace(/\s/g, '') === norm(v.reference).replace(/\s/g, '');
+    vt.ref += okRef;
+    if (!okRef) vt.misses.push(`${v.name} range: ${g.reference ?? '-'} ≠ ${v.reference ?? '-'}`);
     vt.flag += (g.flag ?? null) === (v.flag ?? null);
     if (!okNum) vt.misses.push(`${v.name}: ${g.value} ≠ ${v.value}`);
   }
@@ -119,7 +121,9 @@ for (const d of truth.documents) {
   totals.extra += got.length;
   const meds = cur.items.filter((i) => i.kind === 'medication');
   totals.meds += (d.medications ?? []).length;
-  totals.medsFound += (d.medications ?? []).filter((m) => meds.some((x) => norm(x.name).includes(norm(m.name).split(' ')[0]))).length;
+  const medsHit = (d.medications ?? []).filter((m) => meds.some((x) => norm(x.name).includes(norm(m.name).split(' ')[0])));
+  totals.medsFound += medsHit.length;
+  for (const m of d.medications ?? []) if (!medsHit.includes(m)) vt.misses.push(`medication ${m.name} (missing; read: ${meds.map((x) => x.name).join(', ') || 'none'})`);
   rows.push(r);
   console.log(`${r.kind && r.date ? '✓' : '~'} ${d.id}: kind ${r.kindGot}${r.kind ? '' : ` (want ${d.kind})`}, date ${r.dateGot}${r.date ? '' : ` (want ${d.date})`}, values ${vt.number}/${vt.n} exact, ${vt.name}/${vt.n} found, +${got.length} extra, ${((r.ms ?? 0) / 1000).toFixed(1)} s`);
   if (!keep && ours) await fetch(`${url}/api/documents/${doc.id}`, { method: 'DELETE' });
@@ -150,7 +154,7 @@ const md = [
   '',
   '| document | kind | date | person | issuer | values exact | found | extra | s | misses |',
   '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
-  ...rows.map((r) => (r.error ? `| ${r.id} | failed: ${r.error} | | | | | | | | |` : `| ${r.id} | ${r.kind ? '✓' : r.kindGot} | ${r.date ? '✓' : r.dateGot ?? '-'} | ${r.person ? '✓' : '✗'} | ${r.issuer ? '✓' : '✗'} | ${r.values.number}/${r.values.n} | ${r.values.name}/${r.values.n} | ${r.extra} | ${((r.ms ?? 0) / 1000).toFixed(1)} | ${r.values.misses.slice(0, 4).join('; ')} |`)),
+  ...rows.map((r) => (r.error ? `| ${r.id} | failed: ${r.error} | | | | | | | | |` : `| ${r.id} | ${r.kind ? '✓' : r.kindGot} | ${r.date ? '✓' : r.dateGot ?? '-'} | ${r.person ? '✓' : '✗'} | ${r.issuer ? '✓' : '✗'} | ${r.values.number}/${r.values.n} | ${r.values.name}/${r.values.n} | ${r.extra} | ${((r.ms ?? 0) / 1000).toFixed(1)} | ${r.values.misses.slice(0, 8).join('; ')} |`)),
   '',
 ];
 await writeFile(out, md.join('\n'));

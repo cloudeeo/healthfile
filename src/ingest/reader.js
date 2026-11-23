@@ -23,7 +23,7 @@ export const READER_PROMPT = `Read this page of a document and answer with ONE J
   "amount": for an invoice or a reimbursement statement: { "total": number, "currency": "CHF" | "EUR" | ... } or null,
   "text": the full text of the page, faithfully, in reading order: one line per printed line, table cells separated by " | ", never tabs and never more than one space in a row (do not reproduce the layout with spaces)
 }
-Rules: "lab_report" is only for laboratory results; a doctor's visit or specialist letter is "letter" even when it lists measurements; numeric dates on these documents are day first, as in Europe: 06.12.2025 and 06/12/2025 are 6 December 2025 ("2025-12-06"); copy numbers, units and ranges exactly as printed, including the decimal mark; do not translate; do not summarise; if a part is unreadable write "[illegible]"; JSON only.`;
+Rules: "lab_report" is only for laboratory results; a doctor's visit or specialist letter is "letter" even when it lists measurements; a hospital discharge letter ("lettera di dimissione", "lettre de sortie") is "discharge"; numeric dates on these documents are day first, as in Europe: 06.12.2025 and 06/12/2025 are 6 December 2025 ("2025-12-06"); copy numbers, units and ranges exactly as printed, including the decimal mark; do not translate; do not summarise; if a part is unreadable write "[illegible]"; JSON only.`;
 
 export const REPAIR_PROMPT = 'The following text was meant to be one JSON object with the keys language, kind, date, person_hint, issuer, title, text, values, medications, follow_ups, amount. Return the same content as valid JSON and nothing else. Do not change any value.\n\n';
 
@@ -126,7 +126,25 @@ export const LOOP_STOPS = ['\\t'.repeat(16), '\t'.repeat(16)];
 let stopRefused = false;
 // qvac serve takes `stop` but does not apply it (CLI 0.19): the answer is
 // streamed and cut off here instead, as soon as the run of tabs appears
-const looping = (c) => /(?:\\t){16}$|\t{16}$|(?:\\t|\t)(?:\s|\\t|\t){40}$/.test(c.slice(-200));
+const looping = (c) => /(?:\\t){16}$|\t{16}$|(?:\\t|\t)(?:\s|\\t|\t){40}$/.test(c.slice(-200)) || repeats(c);
+
+/**
+ * Any other loop: the end of the answer is one block of 1–100 characters
+ * written over and over (at least 6 times, at least 200 characters in all).
+ */
+export function repeats(c) {
+  if (c.length < 240) return false;
+  for (let p = 1; p <= 100; p++) {
+    const times = Math.max(6, Math.ceil(200 / p));
+    if (c.length < p * times) break;
+    const block = c.slice(-p);
+    let ok = true;
+    for (let i = 2; i <= times && ok; i++) ok = c.slice(-p * i, -p * (i - 1)) === block;
+    if (ok && block.trim()) return true;
+    if (ok && p <= 2) return true;
+  }
+  return false;
+}
 
 export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
   const t0 = deps.now();

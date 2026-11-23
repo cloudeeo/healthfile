@@ -41,25 +41,33 @@ OpenAI-compatible API on the same machine:
 
 ## How well it reads
 
-The whole corpus, PDF input, one run on omen01 (Qwen3.5-4B, RTX 3060), with
-[scripts/measure-extraction.mjs](scripts/measure-extraction.mjs) against the
-corpus' ground truth:
+The whole corpus, PDF input, on omen01 (Qwen3.5-4B through `qvac serve`, RTX
+3060), measured with [scripts/measure-extraction.mjs](scripts/measure-extraction.mjs)
+against the corpus' ground truth, 23 November 2026:
 
 | Field | Right |
 | --- | --- |
+| measured values found (lab results, weight, height, blood pressure, heart rate) | 170 / 170 |
+| … with the exact number, unit and flag | 170 / 170 |
+| … with the reference range as printed | 164 / 170 |
 | date | 23 / 23 |
 | person (printed name) | 23 / 23 |
-| kind of document | 22 / 23 |
-| issuer | 22 / 23 |
-| lab values found | 158 / 170 (93 %) |
-| values found that are exact (number, unit, range, flag) | 158 / 158 |
-| time per document | 14 s on average (6–9 s a letter, 18–28 s a full lab report) |
+| kind of document | 22 / 23 (the discharge letter read as a letter) |
+| medications | 6 / 10 |
+| time per document | 6–10 s a letter, prescription or invoice; 13–31 s a full lab report |
 
-Every value it found was right; the misses were values it did not report:
-weight and height in the paediatric letters (the prompt asked for values in
-lab reports only, now fixed), a blood pressure written as "130/83" (now split
-in two), and "Piastrine" read as "Piastre" (now recognised). One date printed
-06.12.2025 was read month first; the page's own text now corrects that.
+What it took to get there, from the first run (158 / 170 values, one date
+wrong):
+
+- dates printed day first (06.12.2025) are checked against the page's own
+  text, so a month-first reading is put back;
+- the prompt asks for measurements in letters too, not only in lab reports,
+  and never for prices or amounts; "130/83 mmHg" is split into two values;
+- a flag printed next to a number ("27 *") no longer hides the number;
+- the transcription comes last in the answer, and the answer is streamed:
+  when the model starts looping (an invoice total right-aligned with tab
+  after tab, to the token limit) the request is cut off and everything
+  written before it is kept. An invoice that took 88 s now takes 6 s.
 
 The older mock-mode screenshots:
 
