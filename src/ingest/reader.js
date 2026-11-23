@@ -144,14 +144,38 @@ export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
   }
   let raw = extractJson(r.content);
   let repaired = false;
+  if (!raw && r.finish === 'length') {
+    // still cut off in a loop: repairing 6000 tokens of repetition would loop too;
+    // keep the header fields written before the loop (kind, date, person,
+    // issuer, title) so the page goes to review, with nothing invented
+    const head = salvageHeader(r.content);
+    if (head) return { ok: true, page: normalisePage(head), raw: head, ms: deps.now() - t0, repaired: true, partial: true, finish: 'length' };
+    return { ok: false, error: 'the page is too long for the reader', ms: deps.now() - t0 };
+  }
   if (!raw) {
     // a second pass with the text model, which only has to fix the JSON
     const fix = await complete({ qvac, deps, model: qvac.writer, messages: [{ role: 'user', content: REPAIR_PROMPT + r.content.slice(0, 30_000) }], maxTokens: 6000, temperature: 0, timeoutMs, signal });
     if (fix.ok) raw = extractJson(fix.content);
     repaired = !!raw;
-    if (!raw) return { ok: false, error: r.finish === 'length' ? 'the page is too long for the reader' : 'the reader did not return JSON', ms: deps.now() - t0 };
+    if (!raw) return { ok: false, error: 'the reader did not return JSON', ms: deps.now() - t0 };
   }
   return { ok: true, page: normalisePage(raw), raw, ms: deps.now() - t0, repaired, finish: r.finish ?? null };
+}
+
+/**
+ * The simple fields of an answer cut off before its end: string values of
+ * the header keys, and the amount. Null when not even the kind is there.
+ */
+export function salvageHeader(content) {
+  const text = String(content ?? '');
+  const out = { values: [], medications: [], follow_ups: [] };
+  for (const k of ['language', 'kind', 'date', 'person_hint', 'issuer', 'title']) {
+    const m = new RegExp(`"${k}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"`).exec(text);
+    if (m) out[k] = m[1].replace(/\\"/g, '"');
+  }
+  const total = /"amount"\s*:\s*\{\s*"total"\s*:\s*([0-9.]+)\s*,\s*"currency"\s*:\s*"([A-Z]{3})"/.exec(text);
+  if (total) out.amount = { total: Number(total[1]), currency: total[2] };
+  return out.kind ? out : null;
 }
 
 /** Join the pages of one document: first page's header fields, all texts, all values. */

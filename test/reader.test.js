@@ -145,8 +145,16 @@ test('readPage: an answer cut off in a loop is read once more with a little samp
   assert.equal(deps.seen.length, 2);
   assert.equal(deps.seen[0].temperature, 0);
   assert.equal(deps.seen[1].temperature, 0.3);
-  // twice in a loop: the repair pass gets a try, then the error says why
-  const bad = await readPage({ qvac, deps: fakeDeps([{ loop }, { loop }, 'not json either']), dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
+  // twice in a loop: the header fields written before the loop are kept, no third call
+  const head = '{"language":"it","kind":"invoice","date":"2024-09-21","person_hint":"Marco Bellandi","issuer":"Laboratorio Analisi Demo SA","title":"Fattura","values":[' + '{"name":"Emocromo","value":"18.50"},'.repeat(200);
+  const d2 = fakeDeps([{ loop: head }, { loop: head }]);
+  const part = await readPage({ qvac, deps: d2, dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
+  assert.equal(part.ok, true);
+  assert.equal(part.partial, true);
+  assert.deepEqual([part.page.kind, part.page.date, part.page.personHint, part.page.values.length], ['invoice', '2024-09-21', 'Marco Bellandi', 0]);
+  assert.equal(d2.seen.length, 2);
+  // not even a kind before the loop: the error says why
+  const bad = await readPage({ qvac, deps: fakeDeps([{ loop: '{"values":[' + '1,'.repeat(100) }, { loop: '{"values":[' + '1,'.repeat(100) }]), dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
   assert.equal(bad.ok, false);
   assert.match(bad.error, /too long for the reader/);
 });
