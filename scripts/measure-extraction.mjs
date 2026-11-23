@@ -10,6 +10,7 @@
 //
 // Usage: node scripts/measure-extraction.mjs [--url http://127.0.0.1:8097] [--pdf] [--keep] [--out MEASUREMENTS-extraction.md] [--only marco-lab]
 
+import { analyteOf } from '../src/analytes.js';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -28,6 +29,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'corpus');
 const truth = JSON.parse(await readFile(join(root, 'truth.json'), 'utf8'));
 const status = await (await fetch(`${url}/api/status`)).json();
 
+const idOf = (name) => { const a = analyteOf(name); return a?.id ?? a ?? null; };
 const norm = (s) => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9.,<>%-]+/g, ' ').trim();
 const numOf = (s) => {
   const m = /[-+]?\d+(?:[.,]\d+)?/.exec(String(s ?? '').replace(/\s/g, ''));
@@ -90,7 +92,9 @@ for (const d of truth.documents) {
   const vt = { n: d.values.length, name: 0, number: 0, unit: 0, ref: 0, flag: 0, misses: [] };
   for (const v of d.values) {
     const key = norm(v.name).slice(0, 12);
-    const i = got.findIndex((g) => norm(g.name).slice(0, 12) === key || (norm(g.name).includes(key.split(' ')[0]) && key.split(' ')[0].length > 3));
+    // the same analyte under another printed or read name ("Piastre" for "Piastrine") counts as found
+    const want = idOf(v.name);
+    const i = got.findIndex((g) => (want && (g.analyte ?? idOf(g.name)) === want) || norm(g.name).slice(0, 12) === key || (norm(g.name).includes(key.split(' ')[0]) && key.split(' ')[0].length > 3));
     if (i < 0) {
       vt.misses.push(`${v.name} (missing)`);
       continue;

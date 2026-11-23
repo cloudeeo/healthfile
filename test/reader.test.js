@@ -120,3 +120,16 @@ test('dates: a day-first date read month first is put back, from the page text',
   // a longer number around it is not a date
   assert.equal(dayFirst('2025-06-12', 'Rif. 106.12.20251'), '2025-06-12');
 });
+
+import { splitBloodPressure } from '../src/ingest/reader.js';
+
+test('blood pressure "130/83" becomes two values, in the page language', () => {
+  const out = splitBloodPressure([{ name: 'Pressione arteriosa', value: '130/83', unit: 'mmHg', reference: null, flag: null }, { name: 'Frequenza cardiaca', value: '69', unit: 'bpm' }], 'it');
+  assert.deepEqual(out.map((v) => [v.name, v.value, v.unit]), [['Pressione sistolica', '130', 'mmHg'], ['Pressione diastolica', '83', 'mmHg'], ['Frequenza cardiaca', '69', 'bpm']]);
+  assert.equal(splitBloodPressure([{ name: 'PA', value: '120 / 80' }], 'fr')[1].name, 'Pression diastolique');
+  // a ratio that is not a pressure stays as it is
+  assert.equal(splitBloodPressure([{ name: 'Rapporto albumina/globuline', value: '12/10' }], 'it').length, 1);
+  // through normalisePage, as the reader stores it
+  const p = normalisePage({ language: 'it', kind: 'letter', values: [{ name: 'Pressione arteriosa', value: '130/83', unit: 'mmHg' }] });
+  assert.equal(p.values.length, 2);
+});
