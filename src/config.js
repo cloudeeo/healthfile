@@ -55,6 +55,8 @@ export function loadConfig(env = process.env) {
     /** The default UI language for the family; each browser can change it. */
     lang: LANGS.includes(env.LANG_DEFAULT) ? env.LANG_DEFAULT : 'it',
     familyName: env.FAMILY_NAME || '',
+    // a second copy with the fictional family: labelled DEMO everywhere, its own data folder and port
+    demo: env.DEMO === '1',
     pollMs: intEnv(env.POLL_MS, 2000, 500, 60_000),
   };
 }

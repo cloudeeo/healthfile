@@ -228,3 +228,34 @@ details > summary { cursor: pointer; font-weight: 600; margin: 6px 0; }
   .art { max-width: 220px; }
   .steps { grid-template-columns: 1fr; gap: 10px; }
 }
+
+/* The demo copy (DEMO=1): an amber band under the header on every page */
+.demo-banner {
+  margin: 0;
+  padding: 7px 16px;
+  background: #9a5b00;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+body.demo header.top { border-bottom: 3px solid #9a5b00; }
+body.demo .brand::after {
+  content: "DEMO";
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #9a5b00;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.demo-note {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-left: 3px solid #9a5b00;
+  background: color-mix(in srgb, #9a5b00 10%, var(--surface));
+  font-size: 14px;
+}

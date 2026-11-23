@@ -70,6 +70,7 @@ Configuration is by environment (see [deploy/healthfile.service](deploy/healthfi
 | `EXPLAIN_MODEL` | `medpsy` | MedPsy alias for M3; empty hides the feature. |
 | `LANG_DEFAULT` | `it` | The family's language; each browser can change it (it / fr / en). |
 | `MAX_FILE_MB`, `MAX_PAGES` | `20`, `30` | Upload limits. |
+| `DEMO` | unset | `1` for the demo copy: a DEMO band on every page, its own installable app name, and the only archive the corpus scripts write to. |
 
 The `qvac serve` aliases this expects, in `serve.models` of `qvac.config.json`:
 
@@ -78,6 +79,32 @@ The `qvac serve` aliases this expects, in `serve.models` of `qvac.config.json`:
                "config": { "device": "gpu", "projectionModelSrc": "/path/Qwen3.5-4B.mmproj-Q8_0.gguf", "mmproj-use-gpu": true, "ctx_size": 16384, "reasoning_budget": 0 } },
 "embgemma":  { "type": "llamacpp-embedding", "src": "/path/embeddinggemma-300M-Q8_0.gguf", "preload": true, "config": { "device": "cpu" } }
 ```
+
+## The real archive and the demo
+
+Two copies run side by side on omen01, from the same code and the same
+`qvac serve`, with nothing in common but the models:
+
+| | The family's archive | The demo |
+| --- | --- | --- |
+| Unit | `healthfile` | `healthfile-demo` (`DEMO=1`) |
+| Port, tailnet | 8096, `https://…:8443/` | 8098, `https://…:8444/` |
+| Data | `~/.local/share/healthfile` | `~/.local/share/healthfile-demo` |
+| Content | real documents | the fictional Bellandi/Ferrante family |
+
+The demo says so on every page (an amber DEMO band, "HealthFile · Demo" in
+the tab, "HF Demo" when installed on a phone) and asks not to add real
+documents, so a screenshot or a shared screen can never show the family's
+records. Install it with `bash deploy/install-omen01.sh --demo`, then fill it:
+
+```sh
+node scripts/reset-demo.mjs          # empty the demo, upload the corpus photos, read them with the real model, confirm them
+node scripts/reset-demo.mjs --pdf    # the same from the PDFs
+node scripts/reset-demo.mjs --empty  # only empty it
+```
+
+`reset-demo.mjs` refuses any HealthFile that is not the demo copy, and
+`load-corpus.mjs` refuses a real archive unless given `--force`.
 
 ## Importing a folder
 

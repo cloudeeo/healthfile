@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 // Upload the synthetic corpus to a running HealthFile and confirm every
 // document as read (the demo family in one go). Photos by default; --pdf
-// sends the PDFs instead. Usage: node scripts/load-corpus.mjs [--url http://127.0.0.1:8097] [--pdf] [--no-confirm]
+// sends the PDFs instead. Usage: node scripts/load-corpus.mjs [--url http://127.0.0.1:8097] [--pdf] [--no-confirm] [--force]
+//
+// Only into the demo copy (DEMO=1) or a mock server: the fictional family
+// must not end up in a family's real archive. --force overrides.
 
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +20,18 @@ const usePdf = args.includes('--pdf');
 const confirm = !args.includes('--no-confirm');
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'corpus');
 const truth = JSON.parse(await readFile(join(root, 'truth.json'), 'utf8'));
+
+let status;
+try {
+  status = await (await fetch(`${url}/api/status`)).json();
+} catch (e) {
+  console.error(`no HealthFile at ${url}: ${e.cause?.code || e.message}`);
+  process.exit(1);
+}
+if (!status.demo && !status.mock && !args.includes('--force')) {
+  console.error(`${url} is a real archive (not DEMO=1, not mock): the fictional family stays out of it. Use the demo copy (port 8098) or --force.`);
+  process.exit(1);
+}
 
 const people = (await (await fetch(`${url}/api/people`)).json()).people;
 const byName = new Map(people.map((p) => [p.name, p.id]));

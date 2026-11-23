@@ -103,6 +103,7 @@ export function createHandler({ config, store, ingestor, deps, search }) {
       mock: config.mock,
       lang: config.lang,
       familyName: config.familyName,
+      demo: config.demo,
       counts: store.counts(),
       models: Object.fromEntries(Object.entries(want).map(([k, id]) => [k, id ? { id, state: state(id) } : null])),
       qvac: m.ok ? 'up' : m.error,
@@ -114,6 +115,12 @@ export function createHandler({ config, store, ingestor, deps, search }) {
   }
 
   async function serveStatic(res, pathname) {
+    // the demo installs as its own app, with its own name and colour
+    if (config.demo && pathname === '/manifest.webmanifest') {
+      const m = JSON.parse(await readFile(join(PUBLIC_DIR, 'manifest.webmanifest'), 'utf8'));
+      Object.assign(m, { name: 'HealthFile Demo', short_name: 'HF Demo', description: 'HealthFile with a fictional family, for demos.', theme_color: '#9a5b00' });
+      return send(res, 200, JSON.stringify(m), { 'Content-Type': TYPES['.webmanifest'], 'Cache-Control': 'no-cache' });
+    }
     const rel = PAGES[pathname] ?? decodeURIComponent(pathname).replace(/^\/+/, '');
     const file = normalize(join(PUBLIC_DIR, rel));
     if (!file.startsWith(PUBLIC_DIR + sep)) return send(res, 404, 'not found', { 'Content-Type': 'text/plain' });

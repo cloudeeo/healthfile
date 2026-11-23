@@ -116,6 +116,19 @@ function paintChrome() {
     notice.textContent = t('status.readerDown', { model: s.models.reader.id });
   }
   $('privacy').textContent = s && !s.error ? t('status.private') : '';
+  // the demo copy says so on every page, so a screenshot or a shared screen never leaves a doubt
+  const demo = !!s?.demo;
+  document.body.classList.toggle('demo', demo);
+  document.title = demo ? 'HealthFile · Demo' : 'HealthFile';
+  let banner = $('demo-banner');
+  if (demo && !banner) {
+    banner = el('p', { class: 'demo-banner', id: 'demo-banner' });
+    $('notice').before(banner);
+  }
+  if (banner) {
+    banner.hidden = !demo;
+    banner.textContent = demo ? t('demo.banner') : '';
+  }
   const toReview = state.docs.filter((d) => d.state === 'review' || d.state === 'failed').length;
   const b = $('review-badge');
   b.hidden = !toReview;
@@ -276,7 +289,8 @@ function renderAdd() {
   });
   const list = el('ul', { class: 'uploads', id: 'uploads' });
   paintUploads(list);
-  return el('section', { class: 'card' }, el('h2', {}, t('add.title')), el('label', { class: 'field mb' }, el('span', { text: t('add.person') }), person), drop, list);
+  const demoNote = state.status?.demo ? el('p', { class: 'demo-note', text: t('demo.addNote') }) : null;
+  return el('section', { class: 'card' }, el('h2', {}, t('add.title')), demoNote, el('label', { class: 'field mb' }, el('span', { text: t('add.person') }), person), drop, list);
 }
 
 function paintUploads(list = $('uploads')) {

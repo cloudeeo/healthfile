@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # One-shot install on the home server (run as the normal user; sudo asked once for apt).
-#   bash deploy/install-omen01.sh
+#   bash deploy/install-omen01.sh          # the family's archive (port 8096, https :8443)
+#   bash deploy/install-omen01.sh --demo   # also the demo copy (port 8098, https :8444)
 set -euo pipefail
+DEMO=0
+[ "${1:-}" = "--demo" ] && DEMO=1
 cd "$HOME"
 if ! command -v pdftoppm >/dev/null || ! command -v convert >/dev/null; then
   sudo apt-get install -y poppler-utils imagemagick libheif-examples
@@ -27,3 +30,17 @@ echo
 # publish on the tailnet, HTTPS on port 8443, next to the dashboard
 tailscale serve --bg --https=8443 http://127.0.0.1:8096
 echo "Open https://<this machine's tailnet name>:8443/ from any device on the tailnet."
+
+if [ "$DEMO" = 1 ]; then
+  mkdir -p "$HOME/.local/share/healthfile-demo"
+  chmod 700 "$HOME/.local/share/healthfile-demo"
+  sed "s|^ExecStart=.*|ExecStart=$NODE_BIN src/server.js|" "$HOME/healthfile/deploy/healthfile-demo.service" > "$HOME/.config/systemd/user/healthfile-demo.service"
+  systemctl --user daemon-reload
+  systemctl --user enable healthfile-demo
+  systemctl --user restart healthfile-demo
+  sleep 3
+  curl -s http://127.0.0.1:8098/api/status | head -c 200 || echo "demo not answering yet: journalctl --user -u healthfile-demo -n 20"
+  echo
+  tailscale serve --bg --https=8444 http://127.0.0.1:8098
+  echo "Demo: https://<this machine's tailnet name>:8444/  (fill it with: node scripts/reset-demo.mjs)"
+fi
