@@ -14,18 +14,60 @@ Nothing leaves the house. Every model runs through
 app has no web tools and no outbound connection at all, and the page says so
 on every screen.
 
-![the demo copy on omen01: 23 documents of a fictional family, read by Qwen3.5-4B through qvac serve](docs/demo-home.png)
+These screenshots are the demo copy on the home server: a fictional family
+(23 PDFs in Italian and French, made by [scripts/make_corpus.py](scripts/make_corpus.py)),
+every document read by Qwen3.5-4B through `qvac serve` on an RTX 3060, the
+interface in English.
 
-![home: people and the family's documents (demo data)](docs/home.png)
+![the archive: four people, 23 documents, the values read from them](docs/demo-home.png)
 
-![review: the page beside what was read, every value editable](docs/review.png)
+![one person: every value read over time, out-of-range ones in red](docs/demo-person.png)
 
-![one value over time with its reference band](docs/series.png)
+![one value over five lab reports, with its reference range](docs/demo-series.png)
 
-<img src="docs/phone-review.png" alt="review on a phone" width="300">
+## What it uses from QVAC
 
-The screenshots are from mock mode: the family, the issuers and every number
-are invented ([scripts/make_corpus.py](scripts/make_corpus.py)).
+Everything goes through [`qvac serve`](https://github.com/tetherto/qvac)'s
+OpenAI-compatible API on the same machine:
+
+- **Reading a page:** a vision model (Qwen3.5-4B with its projector) gets the
+  page as an image and answers with one JSON object: kind, date, person,
+  issuer, every value with its unit, range and flag, medications, follow-ups.
+- **Repairing:** when the JSON is malformed, the same model fixes it in a
+  second, text-only call.
+- **Searching:** EmbeddingGemma turns filed documents into vectors.
+- **Next:** questions answered from the documents with citations, and
+  MedPsy to explain a report in plain words.
+
+## How well it reads
+
+The whole corpus, PDF input, one run on omen01 (Qwen3.5-4B, RTX 3060), with
+[scripts/measure-extraction.mjs](scripts/measure-extraction.mjs) against the
+corpus' ground truth:
+
+| Field | Right |
+| --- | --- |
+| date | 23 / 23 |
+| person (printed name) | 23 / 23 |
+| kind of document | 22 / 23 |
+| issuer | 22 / 23 |
+| lab values found | 158 / 170 (93 %) |
+| values found that are exact (number, unit, range, flag) | 158 / 158 |
+| time per document | 14 s on average (6–9 s a letter, 18–28 s a full lab report) |
+
+Every value it found was right; the misses were values it did not report:
+weight and height in the paediatric letters (the prompt asked for values in
+lab reports only, now fixed), a blood pressure written as "130/83" (now split
+in two), and "Piastrine" read as "Piastre" (now recognised). One date printed
+06.12.2025 was read month first; the page's own text now corrects that.
+
+The older mock-mode screenshots:
+
+![home: people and the family's documents (mock)](docs/home.png)
+
+![review: the page beside what was read, every value editable (mock)](docs/review.png)
+
+<img src="docs/phone-review.png" alt="review on a phone (mock)" width="300">
 
 ## What it is not
 
