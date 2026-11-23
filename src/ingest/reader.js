@@ -18,7 +18,7 @@ export const READER_PROMPT = `Read this page of a document and answer with ONE J
   "issuer": the laboratory, practice, hospital, pharmacy or insurer that produced it, or null,
   "title": a short title in the document's language (e.g. "Esami del sangue", "Lettera del pediatra", "Fattura"), max 60 characters,
   "text": the full text of the page, transcribed faithfully, in reading order, with line breaks; tables as one row per line with " | " between cells,
-  "values": every measured value printed with a number, one entry each: in a lab report every analyte; in a visit letter or a paediatric report also weight, height, blood pressure, heart rate, temperature and the like: { "name": as printed, "value": as printed (e.g. "5,4" or "< 0.5"), "unit": as printed or null, "reference": the reference range as printed or null, "flag": "H" | "L" | null as printed }; [] when there are none,
+  "values": every measured value printed with a number, one entry each: in a lab report every analyte; in a visit letter or a paediatric report also weight, height, blood pressure, heart rate, temperature and the like (never prices, amounts, invoice lines, dates or reference numbers): { "name": as printed, "value": as printed (e.g. "5,4" or "< 0.5"), "unit": as printed or null, "reference": the reference range as printed or null, "flag": "H" | "L" | null as printed }; [] when there are none,
   "medications": for a prescription or a letter that prescribes: [{ "name", "dose", "schedule" }], else [],
   "follow_ups": appointments or checks the document asks for: [{ "what", "when" }], else [],
   "amount": for an invoice or a reimbursement statement: { "total": number, "currency": "CHF" | "EUR" | ... } or null
@@ -120,20 +120,28 @@ export function normalisePage(raw) {
  */
 export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
   const t0 = deps.now();
-  const r = await complete({
-    qvac,
-    deps,
-    model: qvac.reader,
-    messages: [
-      { role: 'system', content: READER_SYSTEM },
-      { role: 'user', content: [{ type: 'text', text: READER_PROMPT }, { type: 'image', dataUrl }] },
-    ],
-    maxTokens: 6000,
-    temperature: 0,
-    timeoutMs,
-    signal,
-  });
+  const ask = (temperature) =>
+    complete({
+      qvac,
+      deps,
+      model: qvac.reader,
+      messages: [
+        { role: 'system', content: READER_SYSTEM },
+        { role: 'user', content: [{ type: 'text', text: READER_PROMPT }, { type: 'image', dataUrl }] },
+      ],
+      maxTokens: 6000,
+      temperature,
+      timeoutMs,
+      signal,
+    });
+  let r = await ask(0);
   if (!r.ok) return { ok: false, error: r.error, ms: deps.now() - t0 };
+  // A short page that runs out of tokens is a loop (seen on omen01: an invoice
+  // listed over and over); a second reading with a little sampling breaks it.
+  if (r.finish === 'length' && !extractJson(r.content)) {
+    const again = await ask(0.3);
+    if (again.ok) r = again;
+  }
   let raw = extractJson(r.content);
   let repaired = false;
   if (!raw) {

@@ -52,6 +52,8 @@ function fakeDeps(answers) {
       seen.push(body);
       const a = answers.shift();
       if (typeof a === 'number') return new Response('{"error":{"message":"boom"}}', { status: a });
+      // { loop: text }: an answer cut off at max_tokens
+      if (a && typeof a === 'object') return Response.json({ choices: [{ message: { role: 'assistant', content: a.loop }, finish_reason: 'length' }] });
       return Response.json({ choices: [{ message: { role: 'assistant', content: a }, finish_reason: 'stop' }] });
     },
   };
@@ -132,4 +134,19 @@ test('blood pressure "130/83" becomes two values, in the page language', () => {
   // through normalisePage, as the reader stores it
   const p = normalisePage({ language: 'it', kind: 'letter', values: [{ name: 'Pressione arteriosa', value: '130/83', unit: 'mmHg' }] });
   assert.equal(p.values.length, 2);
+});
+
+test('readPage: an answer cut off in a loop is read once more with a little sampling', async () => {
+  const loop = '{"kind":"invoice","values":[' + '{"name":"Emocromo","value":"18.50"},'.repeat(200);
+  const deps = fakeDeps([{ loop }, '{"kind":"invoice","text":"Fattura","values":[]}']);
+  const r = await readPage({ qvac, deps, dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
+  assert.equal(r.ok, true);
+  assert.equal(r.page.kind, 'invoice');
+  assert.equal(deps.seen.length, 2);
+  assert.equal(deps.seen[0].temperature, 0);
+  assert.equal(deps.seen[1].temperature, 0.3);
+  // twice in a loop: the repair pass gets a try, then the error says why
+  const bad = await readPage({ qvac, deps: fakeDeps([{ loop }, { loop }, 'not json either']), dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
+  assert.equal(bad.ok, false);
+  assert.match(bad.error, /too long for the reader/);
 });
