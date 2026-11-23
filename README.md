@@ -14,6 +14,8 @@ Nothing leaves the house. Every model runs through
 app has no web tools and no outbound connection at all, and the page says so
 on every screen.
 
+![the demo copy on omen01: 23 documents of a fictional family, read by Qwen3.5-4B through qvac serve](docs/demo-home.png)
+
 ![home: people and the family's documents (demo data)](docs/home.png)
 
 ![review: the page beside what was read, every value editable](docs/review.png)
