@@ -1,3 +1,4 @@
+import { SseParser, readChunk } from './sse.js';
 // Non-streaming calls to qvac serve: one chat completion that must return
 // JSON (the page reader, the repair pass), embeddings, and the model list.
 // The API key is read from its file per call and never logged.
@@ -31,11 +32,12 @@ function describe(e, timeoutMs) {
  * One chat completion, not streamed.
  * @returns {Promise<{ ok: true, content: string, usage?: object, ms: number } | { ok: false, error: string, status?: number }>}
  */
-export async function complete({ qvac, deps, model, messages, maxTokens = 2048, temperature = 0.1, json = false, reasoning = false, timeoutMs = DEFAULT_TIMEOUT_MS, signal, extra = {} }) {
+export async function complete({ qvac, deps, model, messages, maxTokens = 2048, temperature = 0.1, json = false, reasoning = false, timeoutMs = DEFAULT_TIMEOUT_MS, signal, extra = {}, until = null }) {
   const t0 = deps.now();
   const payload = {
     model,
-    stream: false,
+    // with `until`, the answer is streamed so it can be cut off early
+    stream: !!until,
     max_tokens: maxTokens,
     temperature,
     messages: messages.map((m) => ({ role: m.role, content: toOpenAIContent(m.content) })),
@@ -43,7 +45,8 @@ export async function complete({ qvac, deps, model, messages, maxTokens = 2048, 
     ...(reasoning ? {} : { reasoning_budget: 0, chat_template_kwargs: { enable_thinking: false } }),
     ...extra,
   };
-  const ctrl = AbortSignal.any([signal ?? new AbortController().signal, AbortSignal.timeout(timeoutMs)]);
+  const own = new AbortController();
+  const ctrl = AbortSignal.any([signal ?? new AbortController().signal, AbortSignal.timeout(timeoutMs), own.signal]);
   let res;
   try {
     res = await deps.fetch(new URL('chat/completions', qvac.baseUrl.replace(/\/?$/, '/')).toString(), {
@@ -55,6 +58,7 @@ export async function complete({ qvac, deps, model, messages, maxTokens = 2048, 
   } catch (e) {
     return { ok: false, error: describe(e, timeoutMs) };
   }
+  if (until && res.status === 200 && /event-stream/i.test(res.headers.get('content-type') ?? '')) return readStream(res, until, own, deps, t0, timeoutMs);
   const text = await res.text().catch(() => '');
   if (res.status !== 200) {
     let msg = `qvac serve answered HTTP ${res.status}`;
@@ -121,6 +125,49 @@ export async function listModels({ qvac, deps, timeoutMs = 5000 }) {
 }
 
 /** Pull the first JSON object out of a model answer (code fences, prose around it). */
+/**
+ * Read a streamed completion, stopping as soon as `until(content)` is true:
+ * the request is aborted and the answer so far comes back with finish
+ * "stopped" (used to cut a looping transcription after a few tokens).
+ */
+async function readStream(res, until, own, deps, t0, timeoutMs) {
+  const parser = new SseParser();
+  const decoder = new TextDecoder();
+  const reader = res.body.getReader();
+  let content = '';
+  let finish = null;
+  let usage = null;
+  const take = (events) => {
+    for (const ev of events) {
+      if (ev.done) return true;
+      if (!ev.json) continue;
+      const c = readChunk(ev.json);
+      if (c.content) content += c.content;
+      if (c.finish) finish = c.finish;
+      if (c.usage) usage = c.usage;
+    }
+    return false;
+  };
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) {
+        take(parser.end());
+        break;
+      }
+      if (take(parser.push(decoder.decode(value, { stream: true })))) break;
+      if (until(content)) {
+        own.abort();
+        await reader.cancel().catch(() => {});
+        return { ok: true, content, finish: 'stopped', usage, ms: deps.now() - t0 };
+      }
+    }
+  } catch (e) {
+    return { ok: false, error: describe(e, timeoutMs) };
+  }
+  return { ok: true, content, finish, usage, ms: deps.now() - t0 };
+}
+
 export function extractJson(text) {
   if (typeof text !== 'string') return null;
   const fenced = /```(?:json)?\s*([\s\S]*?)```/i.exec(text);

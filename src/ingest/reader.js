@@ -124,6 +124,9 @@ export function normalisePage(raw) {
 // limit). "\\t" is how a tab looks inside the JSON string being written.
 export const LOOP_STOPS = ['\\t'.repeat(16), '\t'.repeat(16)];
 let stopRefused = false;
+// qvac serve takes `stop` but does not apply it (CLI 0.19): the answer is
+// streamed and cut off here instead, as soon as the run of tabs appears
+const looping = (c) => /(?:\\t){16}$|\t{16}$|(?:\\t|\t)(?:\s|\\t|\t){40}$/.test(c.slice(-200));
 
 export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
   const t0 = deps.now();
@@ -142,6 +145,7 @@ export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
         timeoutMs,
         signal,
         extra,
+        until: looping,
       });
     if (stopRefused) return call({});
     const r = await call({ stop: LOOP_STOPS });
@@ -163,9 +167,13 @@ export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
   // everything before "text" is complete, keep it and the text up to the loop.
   let cut = salvagePrefix(r.content);
   if (cut) return done(cut, { repaired: true, partial: true, finish: r.finish ?? null });
+  if (r.finish === 'stopped') {
+    const head = salvageHeader(r.content);
+    if (head) return done(head, { repaired: true, partial: true, finish: 'stopped' });
+  }
 
   // Cut off at the token limit before "text": one more reading with a little sampling, which breaks most loops.
-  if (r.finish === 'length') {
+  if (r.finish === 'length' || r.finish === 'stopped') {
     const again = await ask(0.3);
     if (again.ok) {
       raw = extractJson(again.content);
@@ -173,7 +181,7 @@ export async function readPage({ qvac, deps, dataUrl, timeoutMs, signal }) {
       cut = salvagePrefix(again.content) ?? salvageHeader(again.content);
       if (cut) return done(cut, { repaired: true, partial: true, finish: again.finish ?? null });
     }
-    if (r.finish === 'length') {
+    if (r.finish === 'length' || r.finish === 'stopped') {
       const head = salvageHeader(r.content);
       if (head) return done(head, { repaired: true, partial: true, finish: 'length' });
       return { ok: false, error: 'the page is too long for the reader', ms: deps.now() - t0 };

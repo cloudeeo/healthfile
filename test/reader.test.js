@@ -189,3 +189,31 @@ test('readPage: a server that refuses "stop" is asked again without it', async (
   assert.equal(seen.length, 2);
   assert.equal(seen[1].stop, undefined);
 });
+
+test('readPage: a streamed answer is cut off as soon as the tabs start, and what came before is kept', async () => {
+  const head = '{"language":"it","kind":"invoice","date":"2024-09-21","person_hint":"Marco Bellandi","values":[],"amount":{"total":86.1,"currency":"CHF"},"text":"Fattura\\nPrelievo 12.00\\n';
+  let sent = 0;
+  let aborted = false;
+  const deps = {
+    now: () => Date.now(),
+    readFile: async () => 'key',
+    fetch: async (url, init) => {
+      init.signal.addEventListener('abort', () => (aborted = true));
+      const chunks = [head, ...Array.from({ length: 400 }, () => '\\t')];
+      const body = new ReadableStream({
+        pull(ctrl) {
+          if (aborted || !chunks.length) return ctrl.close();
+          sent++;
+          ctrl.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ choices: [{ delta: { content: chunks.shift() } }] })}\n\n`));
+        },
+      });
+      return new Response(body, { headers: { 'Content-Type': 'text/event-stream' } });
+    },
+  };
+  const r = await readPage({ qvac, deps, dataUrl: 'data:image/jpeg;base64,/9j/', timeoutMs: 5000 });
+  assert.equal(r.ok, true);
+  assert.equal(r.partial, true);
+  assert.ok(aborted, 'the request was aborted');
+  assert.ok(sent < 40, `stopped after ${sent} chunks, not 400`);
+  assert.deepEqual([r.page.kind, r.page.amount.total, r.page.text], ['invoice', 86.1, 'Fattura\nPrelievo 12.00']);
+});

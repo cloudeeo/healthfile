@@ -14,7 +14,7 @@ import { join, resolve } from 'node:path';
 import { loadConfig } from '../src/config.js';
 import { realDeps } from '../src/deps.js';
 import { renderPages, sniff } from '../src/ingest/pages.js';
-import { READER_SYSTEM, READER_PROMPT, LOOP_STOPS, salvagePrefix } from '../src/ingest/reader.js';
+import { READER_SYSTEM, READER_PROMPT, LOOP_STOPS, salvagePrefix, readPage } from '../src/ingest/reader.js';
 import { complete } from '../src/llm/client.js';
 
 const args = process.argv.slice(2);
@@ -56,6 +56,10 @@ try {
   console.log(`finish: ${r.finish}, ${c.length} characters, usage ${JSON.stringify(r.usage)}, ${((Date.now() - t0) / 1000).toFixed(1)} s`);
   console.log('\n--- first 1200 characters ---\n' + c.slice(0, 1200));
   if (c.length > 1200) console.log('\n--- last 800 characters ---\n' + c.slice(-800));
+  // and the way the app reads it now: streamed, cut off at the loop
+  const t1 = Date.now();
+  const app = await readPage({ qvac: config.qvac, deps, dataUrl: `data:image/jpeg;base64,${page.toString('base64')}`, timeoutMs: 600_000 });
+  console.log(`\nthe app's reading: ${app.ok ? `kind ${app.page.kind}, date ${app.page.date}, ${app.page.values.length} values, finish ${app.finish}${app.partial ? ', kept before the loop' : ''}` : app.error}, ${((Date.now() - t1) / 1000).toFixed(1)} s`);
   const cut = salvagePrefix(c);
   if (cut) console.log(`\nkept before the transcription: kind ${cut.kind}, date ${cut.date}, ${cut.values?.length ?? 0} values, text ${cut.text?.length ?? 0} characters`);
 } finally {
