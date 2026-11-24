@@ -148,6 +148,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .vals .flag { font-weight: 700; color: var(--critical); text-align: center; }
 .vals .x { border: 0; background: none; color: var(--ink-3); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 6px; }
 .vals .x:hover { color: var(--critical); }
+.vals tr.implausible input:not(.name) { background: color-mix(in srgb, var(--critical) 14%, transparent); border-color: var(--critical); }
+.vals tr.implausible td:nth-child(2) input { font-weight: 700; color: var(--critical); }
 .vals tr.canon td:first-child::after { content: ""; }
 .vals .canon-tag { display: block; font-size: 11px; color: var(--ink-3); padding-left: 7px; }
 .text-block { white-space: pre-wrap; font-family: var(--mono); font-size: 12.5px; background: var(--surface-2); border-radius: 6px; padding: 10px; max-height: 320px; overflow: auto; }

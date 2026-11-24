@@ -6,6 +6,7 @@
 //   #/person/<id>      one person's timeline and values
 //   #/person/<id>/series/<analyte>  one value over time
 
+import { implausible } from './plausible.js';
 import { t, setLang, getLang, detectLang, storedLang, onLangChange, fmtDate, fmtNumber, UI_LANGS } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
@@ -426,6 +427,15 @@ function docEditor(d) {
       el('td', {}, row.value), el('td', {}, row.unit), el('td', {}, row.reference), el('td', { class: 'flag' }, row.flag),
       reviewing ? el('td', {}, el('button', { type: 'button', class: 'x', 'aria-label': t('review.removeValue'), text: '×', onclick: () => (form.measurements.splice(form.measurements.indexOf(m), 1), tr.remove()) })) : null);
     if (!reviewing) for (const inp of Object.values(row)) inp.readOnly = true;
+    // a value no patient has: most likely read into the wrong row
+    const check = () => {
+      const bad = implausible(m.analyte, row.value.value, row.unit.value);
+      tr.classList.toggle('implausible', bad);
+      row.value.title = bad ? t('review.implausible') : '';
+    };
+    row.value.addEventListener('input', check);
+    row.unit.addEventListener('input', check);
+    check();
     tbody.append(tr);
     if (isNew) row.name.focus();
   };

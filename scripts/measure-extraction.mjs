@@ -29,6 +29,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'corpus');
 const truth = JSON.parse(await readFile(join(root, 'truth.json'), 'utf8'));
 const status = await (await fetch(`${url}/api/status`)).json();
 
+import { implausible } from '../public/plausible.js';
 const idOf = (name) => { const a = analyteOf(name); return a?.id ?? a ?? null; };
 const norm = (s) => String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9.,<>%-]+/g, ' ').trim();
 const numOf = (s) => {
@@ -38,7 +39,7 @@ const numOf = (s) => {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const rows = [];
-const totals = { docs: 0, kind: 0, date: 0, person: 0, issuer: 0, values: 0, valueName: 0, valueNumber: 0, valueUnit: 0, valueRef: 0, valueFlag: 0, extra: 0, meds: 0, medsFound: 0, ms: 0, failed: 0 };
+const totals = { docs: 0, kind: 0, date: 0, person: 0, issuer: 0, values: 0, valueName: 0, valueNumber: 0, valueUnit: 0, valueRef: 0, valueFlag: 0, extra: 0, wrong: 0, wrongFlagged: 0, meds: 0, medsFound: 0, ms: 0, failed: 0 };
 
 for (const d of truth.documents) {
   if (only && !d.id.includes(only)) continue;
@@ -95,7 +96,9 @@ for (const d of truth.documents) {
     const key = norm(v.name).slice(0, 12);
     // the same analyte under another printed or read name ("Piastre" for "Piastrine") counts as found
     const want = idOf(v.name);
-    const i = got.findIndex((g) => (want && (g.analyte ?? idOf(g.name)) === want) || norm(g.name).slice(0, 12) === key || (norm(g.name).includes(key.split(' ')[0]) && key.split(' ')[0].length > 3));
+    // a read row that is known to be another analyte ("Emoglobina glicata" for "Emoglobina") never counts as this one
+    const other = (g) => want && (g.analyte ?? idOf(g.name)) && (g.analyte ?? idOf(g.name)) !== want;
+    const i = got.findIndex((g) => (want && (g.analyte ?? idOf(g.name)) === want) || (!other(g) && (norm(g.name).slice(0, 12) === key || (norm(g.name).includes(key.split(' ')[0]) && key.split(' ')[0].length > 3))));
     if (i < 0) {
       vt.misses.push(`${v.name} (missing)`);
       continue;
@@ -109,7 +112,12 @@ for (const d of truth.documents) {
     vt.ref += okRef;
     if (!okRef) vt.misses.push(`${v.name} range: ${g.reference ?? '-'} ≠ ${v.reference ?? '-'}`);
     vt.flag += (g.flag ?? null) === (v.flag ?? null);
-    if (!okNum) vt.misses.push(`${v.name}: ${g.value} ≠ ${v.value}`);
+    if (!okNum) {
+      const flagged = implausible(want, g.value, g.unit);
+      totals.wrong++;
+      totals.wrongFlagged += flagged;
+      vt.misses.push(`${v.name}: ${g.value} ≠ ${v.value}${flagged ? ' (flagged as impossible)' : ''}`);
+    }
   }
   r.values = vt;
   r.extra = got.length;
@@ -145,6 +153,7 @@ const md = [
   `| lab values found (by name) | ${totals.valueName} | ${totals.values} | ${pct(totals.valueName, totals.values)} |`,
   `| lab values exact (number) | ${totals.valueNumber} | ${totals.values} | ${pct(totals.valueNumber, totals.values)} |`,
   `| unit as printed | ${totals.valueUnit} | ${totals.values} | ${pct(totals.valueUnit, totals.values)} |`,
+  `| wrong numbers flagged as impossible in review | ${totals.wrongFlagged} | ${totals.wrong} | ${totals.wrong ? pct(totals.wrongFlagged, totals.wrong) : '-'} |`,
   `| reference range as printed | ${totals.valueRef} | ${totals.values} | ${pct(totals.valueRef, totals.values)} |`,
   `| flag (H/L/none) | ${totals.valueFlag} | ${totals.values} | ${pct(totals.valueFlag, totals.values)} |`,
   `| extra values (not in the truth) | ${totals.extra} | | |`,
