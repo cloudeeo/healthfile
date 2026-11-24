@@ -17,6 +17,10 @@ const BOUNDS = {
   ldl: { 'mg/dl': [5, 800], 'mmol/l': [0.1, 21] },
   triglycerides: { 'mg/dl': [10, 10000], 'mmol/l': [0.1, 115] },
   creatinine: { 'mg/dl': [0.05, 25], 'µmol/l': [4, 2200] },
+  uric_acid: { 'mg/dl': [0.3, 30], 'µmol/l': [20, 1800] },
+  alt: { 'u/l': [1, 20000] },
+  ast: { 'u/l': [1, 20000] },
+  ggt: { 'u/l': [1, 10000] },
   sodium: { 'mmol/l': [95, 185], 'meq/l': [95, 185] },
   potassium: { 'mmol/l': [1, 10], 'meq/l': [1, 10] },
   weight: { kg: [0.3, 400] },
@@ -61,4 +65,9 @@ export function implausible(analyte, value, unit, reference = null) {
   if (outside(numberOf(value))) return true;
   const bounds = String(reference ?? '').replace(/(\d)['’ ](?=\d{3}\b)/g, '$1').match(/\d+(?:[.,]\d+)?/g) || [];
   return bounds.some((x) => outside(Number(x.replace(',', '.'))));
+}
+
+/** True when the unit is one that test is printed in (positive evidence a name and its numbers belong together). */
+export function fits(analyte, unit) {
+  return !!BOUNDS[analyte]?.[unitKey(unit)];
 }

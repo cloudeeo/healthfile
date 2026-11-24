@@ -421,8 +421,10 @@ function docEditor(d) {
   const shiftNote = el('p', { class: 'shift-note', hidden: true, role: 'status' });
   const updateShift = () => {
     const n = tbody.querySelectorAll('tr.implausible').length;
-    shiftNote.hidden = !n;
-    shiftNote.textContent = n ? t('review.shifted', { n }) : '';
+    // a row named "?" is the one the reader left without a name after moving shifted names back
+    const moved = !n && [...tbody.querySelectorAll('input.name')].some((i) => i.value.trim() === '?');
+    shiftNote.hidden = !n && !moved;
+    shiftNote.textContent = n ? t('review.shifted', { n }) : moved ? t('review.realigned') : '';
   };
   const addRow = (m, isNew = false) => {
     const row = {
@@ -444,6 +446,7 @@ function docEditor(d) {
     row.value.addEventListener('input', check);
     row.unit.addEventListener('input', check);
     row.reference.addEventListener('input', check);
+    row.name.addEventListener('input', updateShift);
     check();
     tbody.append(tr);
     if (isNew) row.name.focus();

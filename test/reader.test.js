@@ -253,3 +253,37 @@ test('a name with one letter misread still finds its analyte', () => {
   assert.equal(analyteOf('Peso'), 'weight');
   assert.equal(analyteOf('Pesi'), null);
 });
+
+import { realign } from '../src/ingest/reader.js';
+import { readFileSync } from 'node:fs';
+
+const truthOf = (id) => JSON.parse(readFileSync(new URL('../corpus/truth.json', import.meta.url))).documents.find((d) => d.id === id).values.map((v) => ({ name: v.name, value: v.value, unit: v.unit, reference: v.reference, flag: v.flag ?? null }));
+
+test('names read one row early under a section heading are moved back', () => {
+  // the 2026-03-02 photo: "Emocromo" carries the haemoglobin's numbers, every name is one row early, the last name is lost
+  const truth = truthOf('marco-lab-2026-03-02');
+  const read = truth.map((v, i) => ({ ...v, name: i === 0 ? 'Emocromo' : truth[i - 1].name }));
+  const out = realign(read);
+  assert.deepEqual(out.slice(0, -1).map((v) => [v.name, v.value]), truth.slice(0, -1).map((v) => [v.name, v.value]));
+  assert.equal(out.at(-1).name, '?');
+  assert.equal(out.at(-1).value, truth.at(-1).value);
+});
+
+test('a shift that stops after one row: the lost name becomes "?"', () => {
+  // the 2024-12-02 photo: Emocromo with Hb, Emoglobina with Ht, Ematocrito's name lost, the rest right
+  const truth = truthOf('adele-lab-2024-12-02');
+  const read = [{ ...truth[0], name: 'Emocromo' }, { ...truth[1], name: truth[0].name }, ...truth.slice(2)];
+  const out = realign(read);
+  assert.equal(out[0].name, truth[0].name);
+  assert.equal(out[1].name, '?');
+  assert.deepEqual(out.slice(2), truth.slice(2));
+});
+
+test('a right reading is never touched', () => {
+  for (const id of ['marco-lab-2026-03-02', 'adele-lab-2024-12-02', 'giulia-lab-2025-11-01']) {
+    const truth = truthOf(id);
+    assert.deepEqual(realign(truth), truth);
+    const headed = [{ name: 'Emocromo', value: null, unit: null, reference: null, flag: null }, ...truth];
+    assert.deepEqual(realign(headed), headed);
+  }
+});

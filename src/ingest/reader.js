@@ -3,7 +3,8 @@
 
 import { complete, extractJson } from '../llm/client.js';
 import { KINDS } from '../store.js';
-import { toMeasurement } from '../analytes.js';
+import { toMeasurement, analyteOf } from '../analytes.js';
+import { implausible, fits } from '../../public/plausible.js';
 
 export const READER_SYSTEM =
   'You read medical and administrative documents for a family archive. ' +
@@ -30,6 +31,41 @@ Rules: "lab_report" is only for laboratory results; a doctor's visit or speciali
 export function rangeOf(reference) {
   const r = typeof reference === 'string' && reference.trim() ? reference.trim().slice(0, 60) : null;
   return r && /percentil/i.test(r) ? null : r;
+}
+
+// A photo of a lab report sometimes comes back with the section heading
+// ("Emocromo") read as a test that carries the first row's numbers, and every
+// name below it one row too early: Emoglobina with the haematocrit's 47,3 %,
+// and so on down. The numbers are in order, the names are not. When moving
+// the names back up by one, from a row whose name is no known test, clears
+// every impossible row, that is done; the row left without its own name gets
+// "?" so review shows it. Nothing changes when no row is impossible, or when
+// no such move clears them all.
+export const UNNAMED = '?';
+
+function impossibleCount(rows) {
+  return rows.filter((v) => implausible(analyteOf(v.name), v.value, v.unit, v.reference)).length;
+}
+
+export function realign(values) {
+  if (!impossibleCount(values)) return values;
+  const fitting = (rows) => rows.filter((v) => fits(analyteOf(v.name), v.unit)).length;
+  // of the moves that clear every impossible row: the one where most names fit their unit, then the longest
+  let best = null;
+  let bestFit = -1;
+  for (let s = 0; s < values.length - 1; s++) {
+    if (analyteOf(values[s].name)) continue;
+    for (let e = s + 2; e <= values.length; e++) {
+      const rows = values.map((v, i) => (i < s || i >= e ? v : { ...v, name: i + 1 < e ? values[i + 1].name : UNNAMED }));
+      if (impossibleCount(rows)) continue;
+      const f = fitting(rows);
+      if (f >= bestFit) {
+        best = rows;
+        bestFit = f;
+      }
+    }
+  }
+  return best ?? values;
 }
 
 export const REPAIR_PROMPT = 'The following text was meant to be one JSON object with the keys language, kind, date, person_hint, issuer, title, text, values, medications, follow_ups, amount. Return the same content as valid JSON and nothing else. Do not change any value.\n\n';
@@ -89,13 +125,13 @@ export function normalisePage(raw) {
   const kind = KINDS.includes(o.kind) ? o.kind : 'other';
   const language = LANGS.has(o.language) ? o.language : 'other';
   const arr = (v) => (Array.isArray(v) ? v : []);
-  const values = splitBloodPressure(
+  const values = realign(splitBloodPressure(
     arr(o.values)
       .filter((v) => v && typeof v === 'object' && typeof v.name === 'string' && v.name.trim())
       .slice(0, 200)
       .map((v) => ({ name: v.name.trim().slice(0, 120), value: v.value == null ? null : String(v.value).trim().slice(0, 40), unit: str(v.unit, 30), reference: rangeOf(v.reference), flag: str(v.flag, 8) })),
     language,
-  );
+  ));
   const medications = arr(o.medications)
     .filter((m) => m && typeof m === 'object' && typeof m.name === 'string' && m.name.trim())
     .slice(0, 50)
