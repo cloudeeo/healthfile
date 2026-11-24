@@ -39,7 +39,7 @@ const numOf = (s) => {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const rows = [];
-const totals = { docs: 0, kind: 0, date: 0, person: 0, issuer: 0, values: 0, valueName: 0, valueNumber: 0, valueUnit: 0, valueRef: 0, valueFlag: 0, extra: 0, wrong: 0, wrongFlagged: 0, meds: 0, medsFound: 0, ms: 0, failed: 0 };
+const totals = { docs: 0, kind: 0, date: 0, person: 0, issuer: 0, values: 0, valueName: 0, valueNumber: 0, valueUnit: 0, valueRef: 0, valueFlag: 0, extra: 0, wrong: 0, wrongFlagged: 0, docsWrong: 0, docsWarned: 0, meds: 0, medsFound: 0, ms: 0, failed: 0 };
 
 for (const d of truth.documents) {
   if (only && !d.id.includes(only)) continue;
@@ -116,10 +116,16 @@ for (const d of truth.documents) {
       const flagged = implausible(want, g.value, g.unit, g.reference);
       totals.wrong++;
       totals.wrongFlagged += flagged;
+      vt.wrong = (vt.wrong ?? 0) + 1;
+      vt.flagged = (vt.flagged ?? 0) + flagged;
       vt.misses.push(`${v.name}: ${g.value} ≠ ${v.value}${flagged ? ' (flagged as impossible)' : ''}`);
     }
   }
   r.values = vt;
+  if (vt.wrong) {
+    totals.docsWrong++;
+    totals.docsWarned += vt.flagged > 0;
+  }
   r.extra = got.length;
   totals.values += vt.n;
   totals.valueName += vt.name;
@@ -154,6 +160,7 @@ const md = [
   `| lab values exact (number) | ${totals.valueNumber} | ${totals.values} | ${pct(totals.valueNumber, totals.values)} |`,
   `| unit as printed | ${totals.valueUnit} | ${totals.values} | ${pct(totals.valueUnit, totals.values)} |`,
   `| wrong numbers flagged as impossible in review | ${totals.wrongFlagged} | ${totals.wrong} | ${totals.wrong ? pct(totals.wrongFlagged, totals.wrong) : '-'} |`,
+  `| documents with wrong numbers where review shows the shifted-rows warning | ${totals.docsWarned} | ${totals.docsWrong} | ${totals.docsWrong ? pct(totals.docsWarned, totals.docsWrong) : '-'} |`,
   `| reference range as printed | ${totals.valueRef} | ${totals.values} | ${pct(totals.valueRef, totals.values)} |`,
   `| flag (H/L/none) | ${totals.valueFlag} | ${totals.values} | ${pct(totals.valueFlag, totals.values)} |`,
   `| extra values (not in the truth) | ${totals.extra} | | |`,

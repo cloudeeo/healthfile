@@ -417,6 +417,13 @@ function docEditor(d) {
 
   // values table
   const tbody = el('tbody');
+  // one impossible row usually means the rows of that table were read shifted: say so once, above it
+  const shiftNote = el('p', { class: 'shift-note', hidden: true, role: 'status' });
+  const updateShift = () => {
+    const n = tbody.querySelectorAll('tr.implausible').length;
+    shiftNote.hidden = !n;
+    shiftNote.textContent = n ? t('review.shifted', { n }) : '';
+  };
   const addRow = (m, isNew = false) => {
     const row = {
       name: el('input', { class: 'name', value: m.name || '' }), value: el('input', { value: m.value || '' }), unit: el('input', { value: m.unit || '' }), reference: el('input', { value: m.reference || '' }), flag: el('input', { class: 'flag-in', value: m.flag || '', maxlength: 2 }),
@@ -432,6 +439,7 @@ function docEditor(d) {
       const bad = implausible(m.analyte, row.value.value, row.unit.value, row.reference.value);
       tr.classList.toggle('implausible', bad);
       row.value.title = bad ? t('review.implausible') : '';
+      updateShift();
     };
     row.value.addEventListener('input', check);
     row.unit.addEventListener('input', check);
@@ -444,6 +452,7 @@ function docEditor(d) {
   const values = el('details', { open: form.measurements.length > 0 || d.kind === 'lab_report' },
     el('summary', {}, t('review.values'), ' ', el('span', { class: 'sub', text: `(${t('common.values', { n: form.measurements.length })})` })),
     reviewing ? el('p', { class: 'hint', text: t('review.valuesHint') }) : null,
+    shiftNote,
     el('div', { class: 'table-wrap' }, el('table', { class: 'vals' }, el('thead', {}, el('tr', {}, ['name', 'value', 'unit', 'ref', 'flag'].map((c) => el('th', { text: t(`review.col.${c}`) })), reviewing ? el('th') : null)), tbody)),
     reviewing ? el('div', { class: 'row-actions' }, el('button', { type: 'button', class: 'chip', text: `+ ${t('review.addValue')}`, onclick: () => { const m = { name: '', value: '', unit: '', reference: '', flag: '', edited: true }; form.measurements.push(m); addRow(m, true); } })) : null);
 
