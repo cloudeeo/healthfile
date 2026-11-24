@@ -106,7 +106,7 @@ The older mock-mode screenshots:
 
 ![review: the page beside what was read, every value editable (mock)](docs/review.png)
 
-<img src="docs/phone-review.png" alt="review on a phone (mock)" width="300">
+<img src="docs/demo-review-phone.png" alt="review on a phone: the March 2026 lab report read from a photo, every field editable" width="300">
 
 ## What it is not
 
