@@ -49,9 +49,8 @@ twice: as the PDFs, and as phone photos of the printed pages.
 | Field | PDF | Photo |
 | --- | --- | --- |
 | measured values found (lab results, weight, height, blood pressure, heart rate) | 170 / 170 | 167 / 170 |
-| … with the exact number | 170 / 170 | 150 / 170 |
-| … with the unit as printed | 170 / 170 | 158 / 170 |
-| … with the reference range as printed | 170 / 170 | 150 / 170 |
+| … with the exact number, unit, range and flag | 170 / 170 | 167 / 170 |
+| wrong numbers | 0 | 0 |
 | kind of document | 23 / 23 | 23 / 23 |
 | date | 23 / 23 | 23 / 23 |
 | person (printed name) | 23 / 23 | 23 / 23 |
@@ -59,17 +58,27 @@ twice: as the PDFs, and as phone photos of the printed pages.
 | medications | 8 / 10 | 9 / 10 |
 | time per document | 6–11 s a letter, prescription or invoice; 14–30 s a full lab report | about the same |
 
-From the PDFs every number is right. From photos, almost all the wrong
-numbers come from two lab reports where the model read the blood count one
-row off: each test got the value, unit and range of the test below it. That
-is the dangerous kind of mistake (plausible names, wrong numbers), so review
-now checks every row: a value, unit or range that no patient can have for
-that test (a haemoglobin in %, white cells with the platelets' range) turns
-the row red, and one red row brings a note above the table to check every
-value against the page. On this run 9 of the 17 wrong numbers were red
-themselves, and both shifted reports got the note. The bounds are wide on
-purpose: they catch reading errors, they say nothing about whether a result
-is normal, and none of the 170 right values triggers them.
+From photos, the model sometimes reads a section heading ("Emocromo") as if
+it were a test: the heading gets the first row's numbers, and every name
+below it lands one row early (haemoglobin with the haematocrit's 47,3 %).
+That is the dangerous kind of mistake, plausible names on wrong numbers, so
+two things catch it:
+
+- each row is checked against what any patient can have for that test: a
+  value, unit or range that is impossible (a haemoglobin in %, white cells
+  with the platelets' range) means the row was read shifted;
+- when moving the names back up by one, from the heading, clears every
+  impossible row and puts each name on a unit it is printed in, the reader
+  does it. The row left without its own name is shown as "?", with a note
+  above the table to check the values and name it. When no such move works,
+  the impossible rows stay red with the same note.
+
+Before that check, the same photos gave 150 / 170 exact numbers, with 17
+wrong ones under the right names. With it: no wrong number; the 3 values
+still missing are the two "?" rows and one haemoglobin left under the
+heading's name, all visible in review. The bounds are wide on purpose: they
+catch reading errors, they say nothing about whether a result is normal, and
+none of the 170 right values triggers them.
 
 The remaining misses: a supplement the model writes in English ("Vitamin D3"
 for "Vitamina D3"), one paediatric letter whose "continue with vitamin D" it
