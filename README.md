@@ -25,6 +25,8 @@ interface in English.
 
 ![one value over five lab reports, with its reference range](docs/demo-series.png)
 
+<img src="docs/demo-review-phone.png" alt="review on a phone: the March 2026 lab report read from a photo, every field editable" width="300">
+
 ## What it uses from QVAC
 
 Everything goes through [`qvac serve`](https://github.com/tetherto/qvac)'s
@@ -105,8 +107,6 @@ The older mock-mode screenshots:
 ![home: people and the family's documents (mock)](docs/home.png)
 
 ![review: the page beside what was read, every value editable (mock)](docs/review.png)
-
-<img src="docs/demo-review-phone.png" alt="review on a phone: the March 2026 lab report read from a photo, every field editable" width="300">
 
 ## What it is not
 
