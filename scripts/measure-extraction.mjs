@@ -87,9 +87,10 @@ for (const d of truth.documents) {
   totals.date += r.date;
   totals.person += r.person;
   totals.issuer += r.issuer;
+  const issuerMiss = r.issuer ? null : `issuer: ${cur.issuer ?? '-'} ≠ ${d.issuer}`;
   // values: match each truth value to a read value by name (normalised, first 12 chars)
   const got = cur.measurements.slice();
-  const vt = { n: d.values.length, name: 0, number: 0, unit: 0, ref: 0, flag: 0, misses: [] };
+  const vt = { n: d.values.length, name: 0, number: 0, unit: 0, ref: 0, flag: 0, misses: issuerMiss ? [issuerMiss] : [] };
   for (const v of d.values) {
     const key = norm(v.name).slice(0, 12);
     // the same analyte under another printed or read name ("Piastre" for "Piastrine") counts as found

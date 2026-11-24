@@ -18,12 +18,19 @@ export const READER_PROMPT = `Read this page of a document and answer with ONE J
   "issuer": the laboratory, practice, hospital, pharmacy or insurer that produced it, or null,
   "title": a short title in the document's language (e.g. "Esami del sangue", "Lettera del pediatra", "Fattura"), max 60 characters,
   "values": every measured value printed with a number, one entry each: in a lab report every analyte; in a visit letter or a paediatric report also weight, height, blood pressure, heart rate, temperature and the like (never prices, amounts, invoice lines, dates or reference numbers): { "name": as printed, "value": as printed (e.g. "5,4" or "< 0.5"), "unit": as printed or null, "reference": the reference range as printed or null, "flag": "H" | "L" | null as printed }; [] when there are none,
-  "medications": for a prescription or a letter that prescribes: [{ "name", "dose", "schedule" }], else [],
+  "medications": for a prescription, or a letter that prescribes or recommends a medicine or supplement (also "continue with ..."): [{ "name": as printed, in the document's language, "dose", "schedule" }], else [],
   "follow_ups": appointments or checks the document asks for: [{ "what", "when" }], else [],
   "amount": for an invoice or a reimbursement statement: { "total": number, "currency": "CHF" | "EUR" | ... } or null,
   "text": the full text of the page, faithfully, in reading order: one line per printed line, table cells separated by " | ", never tabs and never more than one space in a row (do not reproduce the layout with spaces)
 }
 Rules: "lab_report" is only for laboratory results; a doctor's visit or specialist letter is "letter" even when it lists measurements; a hospital discharge letter ("lettera di dimissione", "lettre de sortie") is "discharge"; numeric dates on these documents are day first, as in Europe: 06.12.2025 and 06/12/2025 are 6 December 2025 ("2025-12-06"); copy numbers, units and ranges exactly as printed, including the decimal mark; do not translate; do not summarise; if a part is unreadable write "[illegible]"; JSON only.`;
+
+// A growth percentile ("50° percentile") is where a child sits, not a
+// reference range: it is not kept as one.
+export function rangeOf(reference) {
+  const r = typeof reference === 'string' && reference.trim() ? reference.trim().slice(0, 60) : null;
+  return r && /percentil/i.test(r) ? null : r;
+}
 
 export const REPAIR_PROMPT = 'The following text was meant to be one JSON object with the keys language, kind, date, person_hint, issuer, title, text, values, medications, follow_ups, amount. Return the same content as valid JSON and nothing else. Do not change any value.\n\n';
 
@@ -86,7 +93,7 @@ export function normalisePage(raw) {
     arr(o.values)
       .filter((v) => v && typeof v === 'object' && typeof v.name === 'string' && v.name.trim())
       .slice(0, 200)
-      .map((v) => ({ name: v.name.trim().slice(0, 120), value: v.value == null ? null : String(v.value).trim().slice(0, 40), unit: str(v.unit, 30), reference: str(v.reference, 60), flag: str(v.flag, 8) })),
+      .map((v) => ({ name: v.name.trim().slice(0, 120), value: v.value == null ? null : String(v.value).trim().slice(0, 40), unit: str(v.unit, 30), reference: rangeOf(v.reference), flag: str(v.flag, 8) })),
     language,
   );
   const medications = arr(o.medications)

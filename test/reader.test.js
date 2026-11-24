@@ -226,3 +226,20 @@ test('repeats: a block written over and over is a loop; ordinary text is not', (
   assert.equal(repeats('Emoglobina 13,4 g/dL 12.0 - 16.0\nEmatocrito 38,2 % 36 - 46\n'.repeat(2) + 'Leucociti 6,5'), false);
   assert.equal(repeats('-'.repeat(80) + '\nTotale CHF 86.10'), false);
 });
+
+import { rangeOf } from '../src/ingest/reader.js';
+
+test('a growth percentile is not kept as a reference range', () => {
+  assert.equal(rangeOf('50° percentile'), null);
+  assert.equal(rangeOf('60° percentile'), null);
+  assert.equal(rangeOf('3,5 - 5,1'), '3,5 - 5,1');
+  assert.equal(rangeOf(''), null);
+  assert.equal(rangeOf(null), null);
+  const p = normalisePage({ kind: 'letter', values: [{ name: 'Peso', value: '44,7', unit: 'kg', reference: '50° percentile' }], text: 'x' });
+  assert.equal(p.values[0].reference, null);
+});
+
+test('the prompt asks for recommended supplements, named as printed', () => {
+  assert.match(READER_PROMPT, /recommends a medicine or supplement/);
+  assert.match(READER_PROMPT, /in the document's language/);
+});
