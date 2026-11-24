@@ -42,9 +42,23 @@ export function numberOf(value) {
   return m ? Number(m[0].replace(',', '.')) : null;
 }
 
-/** True when the value cannot be a real result for that analyte in that unit. */
-export function implausible(analyte, value, unit) {
-  const b = BOUNDS[analyte]?.[unitKey(unit)];
-  const n = numberOf(value);
-  return !!b && n != null && (n < b[0] || n > b[1]);
+const ALL_UNITS = new Set(Object.values(BOUNDS).flatMap((u) => Object.keys(u)));
+
+/**
+ * True when the row cannot be a real result for that analyte: the number, or
+ * a bound of its printed range, is outside what any patient has, or the unit
+ * is one that belongs to other tests (a haemoglobin in %, a haematocrit in
+ * 10^6/µL: the row below was read into this one).
+ */
+export function implausible(analyte, value, unit, reference = null) {
+  const units = BOUNDS[analyte];
+  if (!units) return false;
+  const key = unitKey(unit);
+  if (key && !units[key] && ALL_UNITS.has(key)) return true;
+  const b = units[key];
+  if (!b) return false;
+  const outside = (n) => n != null && (n < b[0] || n > b[1]);
+  if (outside(numberOf(value))) return true;
+  const bounds = String(reference ?? '').replace(/(\d)['’ ](?=\d{3}\b)/g, '$1').match(/\d+(?:[.,]\d+)?/g) || [];
+  return bounds.some((x) => outside(Number(x.replace(',', '.'))));
 }

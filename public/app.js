@@ -429,12 +429,13 @@ function docEditor(d) {
     if (!reviewing) for (const inp of Object.values(row)) inp.readOnly = true;
     // a value no patient has: most likely read into the wrong row
     const check = () => {
-      const bad = implausible(m.analyte, row.value.value, row.unit.value);
+      const bad = implausible(m.analyte, row.value.value, row.unit.value, row.reference.value);
       tr.classList.toggle('implausible', bad);
       row.value.title = bad ? t('review.implausible') : '';
     };
     row.value.addEventListener('input', check);
     row.unit.addEventListener('input', check);
+    row.reference.addEventListener('input', check);
     check();
     tbody.append(tr);
     if (isNew) row.name.focus();

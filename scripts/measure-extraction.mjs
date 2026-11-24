@@ -113,7 +113,7 @@ for (const d of truth.documents) {
     if (!okRef) vt.misses.push(`${v.name} range: ${g.reference ?? '-'} ≠ ${v.reference ?? '-'}`);
     vt.flag += (g.flag ?? null) === (v.flag ?? null);
     if (!okNum) {
-      const flagged = implausible(want, g.value, g.unit);
+      const flagged = implausible(want, g.value, g.unit, g.reference);
       totals.wrong++;
       totals.wrongFlagged += flagged;
       vt.misses.push(`${v.name}: ${g.value} ≠ ${v.value}${flagged ? ' (flagged as impossible)' : ''}`);
