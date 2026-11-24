@@ -41,23 +41,42 @@ OpenAI-compatible API on the same machine:
 
 ## How well it reads
 
-The whole corpus, PDF input, on the home server (omen01, Qwen3.5-4B through `qvac serve`, RTX
-3060), measured with [scripts/measure-extraction.mjs](scripts/measure-extraction.mjs)
-against the corpus' ground truth, 23 November 2026:
+The whole corpus on the home server (omen01, Qwen3.5-4B through `qvac serve`,
+RTX 3060), measured with [scripts/measure-extraction.mjs](scripts/measure-extraction.mjs)
+against the corpus' ground truth, 24 November 2026. The same 23 documents
+twice: as the PDFs, and as phone photos of the printed pages.
 
-| Field | Right |
-| --- | --- |
-| measured values found (lab results, weight, height, blood pressure, heart rate) | 170 / 170 |
-| … with the exact number, unit and flag | 170 / 170 |
-| … with the reference range as printed | 164 / 170 |
-| date | 23 / 23 |
-| person (printed name) | 23 / 23 |
-| kind of document | 22 / 23 (the discharge letter read as a letter; prompt fixed since, to re-measure) |
-| medications | 6 / 10 |
-| time per document | 6–10 s a letter, prescription or invoice; 13–31 s a full lab report |
+| Field | PDF | Photo |
+| --- | --- | --- |
+| measured values found (lab results, weight, height, blood pressure, heart rate) | 170 / 170 | 167 / 170 |
+| … with the exact number | 170 / 170 | 150 / 170 |
+| … with the unit as printed | 170 / 170 | 158 / 170 |
+| … with the reference range as printed | 170 / 170 | 150 / 170 |
+| kind of document | 23 / 23 | 23 / 23 |
+| date | 23 / 23 | 23 / 23 |
+| person (printed name) | 23 / 23 | 23 / 23 |
+| issuer | 22 / 23 | 22 / 23 |
+| medications | 8 / 10 | 9 / 10 |
+| time per document | 6–11 s a letter, prescription or invoice; 14–30 s a full lab report | about the same |
 
-What it took to get there, from the first run (158 / 170 values, one date
-wrong):
+From the PDFs every number is right. From photos, almost all the wrong
+numbers come from two lab reports where the model read the blood count one
+row off: each test got the value, unit and range of the test below it. That
+is the dangerous kind of mistake (plausible names, wrong numbers), so review
+now checks every row: a value, unit or range that no patient can have for
+that test (a haemoglobin in %, white cells with the platelets' range) turns
+the row red, and one red row brings a note above the table to check every
+value against the page. On this run 9 of the 17 wrong numbers were red
+themselves, and both shifted reports got the note. The bounds are wide on
+purpose: they catch reading errors, they say nothing about whether a result
+is normal, and none of the 170 right values triggers them.
+
+The remaining misses: a supplement the model writes in English ("Vitamin D3"
+for "Vitamina D3"), one paediatric letter whose "continue with vitamin D" it
+skips, and a pharmacy name misspelt.
+
+What it took to get there, from the first PDF run (158 / 170 values, one
+date wrong):
 
 - dates printed day first (06.12.2025) are checked against the page's own
   text, so a month-first reading is put back;
@@ -68,6 +87,9 @@ wrong):
   when the model starts looping (an invoice total right-aligned with tab
   after tab, to the token limit) the request is cut off and everything
   written before it is kept. An invoice that took 88 s now takes 6 s.
+- a growth percentile ("50° percentile") is not taken for a reference range;
+  supplements a letter recommends count as medications; a test name with
+  one letter misread in a photo ("Piastreine") still finds its test.
 
 The older mock-mode screenshots:
 
