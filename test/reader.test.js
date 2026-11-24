@@ -243,3 +243,13 @@ test('the prompt asks for recommended supplements, named as printed', () => {
   assert.match(READER_PROMPT, /recommends a medicine or supplement/);
   assert.match(READER_PROMPT, /in the document's language/);
 });
+
+import { analyteOf } from '../src/analytes.js';
+
+test('a name with one letter misread still finds its analyte', () => {
+  assert.equal(analyteOf('Piastreine'), 'platelets');
+  assert.equal(analyteOf('Piastrine'), 'platelets');
+  assert.equal(analyteOf('Emocromo'), null);
+  assert.equal(analyteOf('Peso'), 'weight');
+  assert.equal(analyteOf('Pesi'), null);
+});

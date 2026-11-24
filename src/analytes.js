@@ -103,7 +103,26 @@ export function analyteOf(name) {
     const head = words.slice(0, len).join(' ');
     if (BY_ALIAS.has(head)) return BY_ALIAS.get(head);
   }
-  return null;
+  return nearOf(n);
+}
+
+// A letter misread in a photo ("Piastreine", "Emoglobna"): one edit away from
+// exactly one analyte's name, for names long enough that one edit cannot turn
+// one test into another.
+function nearOf(n) {
+  if (n.length < 7) return null;
+  const ids = new Set();
+  for (const [alias, id] of BY_ALIAS) if (alias.length >= 7 && Math.abs(alias.length - n.length) <= 1 && oneEdit(alias, n)) ids.add(id);
+  return ids.size === 1 ? [...ids][0] : null;
+}
+
+function oneEdit(a, b) {
+  if (a === b) return true;
+  if (a.length > b.length) [a, b] = [b, a];
+  let i = 0;
+  while (i < a.length && a[i] === b[i]) i++;
+  if (a.length === b.length) return a.slice(i + 1) === b.slice(i + 1);
+  return a.slice(i) === b.slice(i + 1);
 }
 
 /** "5,4" → 5.4; "< 0.5" → 0.5 (with the sign kept in `value`); "negativo" → null. */

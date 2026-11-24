@@ -191,6 +191,16 @@ details > summary { cursor: pointer; font-weight: 600; margin: 6px 0; }
 /* the flag is one or two letters: keep its column narrow so it stays in view */
 .vals th:nth-child(5), .vals td:nth-child(5) { width: 2.6em; }
 .vals input.flag-in { width: 2.2em; padding: 5px 2px; text-align: center; }
+/* phones: each value on two lines, the name above, value, unit, range and flag below, so nothing is cut */
+@media (max-width: 560px) {
+  .vals { min-width: 0; display: block; }
+  .vals thead, .vals tbody { display: block; }
+  .vals tr { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1.5fr) 2.4em 28px; align-items: center; border-bottom: 1px solid var(--rule); }
+  .vals th, .vals td { border-bottom: 0; min-width: 0 !important; width: auto; }
+  .vals td:nth-child(1) { grid-column: 1 / -1; }
+  .vals th:nth-child(1) { grid-column: 1 / -1; height: 0; padding: 0; overflow: hidden; font-size: 0; }
+  .vals tr:not(:has(td:nth-child(6))) { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1.5fr) 2.4em; }
+}
 
 /* home: welcome block */
 .hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 8px 24px; align-items: center; padding: 22px 22px 18px; border-radius: 14px; border: 1px solid var(--rule);
